@@ -23,7 +23,7 @@ enable_testing() #to discover tests in test explorer
 add_executable(HIDDataInterpreterTests test_double_joystick.cpp) # add this executable
 
 target_link_libraries(HIDDataInterpreterTests PRIVATE gtest) # link google test to this executable
-target_link_libraries(HIDDataInterpreterLib PRIVATE gtest) # link google test to this executable
+target_link_libraries(HIDDataInterpreterTests PRIVATE HIDDataInterpreterLib)
 
 include(GoogleTest)
 gtest_discover_tests(HIDDataInterpreterTests) # discovers tests by asking the compiled test executable to enumerate its tests

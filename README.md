@@ -1,12 +1,15 @@
 # Introduction
-This project aims to provide a platform independent HID report descriptor parser and build a data parser allowing to properly parse data from the peripheral in order to access to them easily and in an abstract way.
+This project aims to provide a platform independent HID report descriptor parser and data parser.
+It allows to parse and access data from a USB device in an abstract manner.
 
 # Supported devices
-[X] Joysticks
+[X] Joystick
 
-# How to use the library
+# Usage
 
 ```
+#include "HID.h"
+
 uint_8_t *hid_report_data[1024]; //hid report read from USB
 //libusb_control_transfer(handle, LIBUSB_ENDPOINT_IN|LIBUSB_RECIPIENT_INTERFACE, LIBUSB_REQUEST_GET_DESCRIPTOR, (LIBUSB_DT_REPORT << 8)|interface_num, 0, hid_report_data, sizeof(hid_report_data), 5000);
 

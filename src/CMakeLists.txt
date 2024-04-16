@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.14)
 project(HIDDataInterpreterLib VERSION 1.0.0)
 
+set (CMAKE_CXX_STANDARD 11)
+
 #List of sources
 file(GLOB SRC_FILES ${PROJECT_SOURCE_DIR}/*.cpp)
 
@@ -17,4 +19,4 @@ endif()
 
 add_library(HIDDataInterpreterLib ${SRC_FILES} ${HEADERS_FILES})
 
-target_include_directories(HIDDataInterpreterLib PUBLIC ${HEADERS_FILES})
+target_include_directories(HIDDataInterpreterLib PUBLIC ${PROJECT_SOURCE_DIR}/../inc)
