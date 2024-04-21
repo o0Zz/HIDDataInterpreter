@@ -21,7 +21,7 @@ enum class HIDInputType {
     Slider      = 0x36,
     Dial        = 0x37,
     Wheel       = 0x38,
-    HatSwitch  = 0x39
+    HatSwitch  = 0x39,
 };
 
 class HIDUsage

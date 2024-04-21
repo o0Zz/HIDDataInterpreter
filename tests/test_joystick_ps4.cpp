@@ -262,6 +262,12 @@ TEST(PS4, test_report_has_1_gamepad)
 }
 
 
+TEST(PS4, test_report_is_gamepad)
+{
+	std::shared_ptr<HIDReportDescriptor> hid_report_descriptor = std::make_shared<HIDReportDescriptor>(PS4_1, (uint16_t)sizeof(PS4_1));
+	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->report_type, HIDReportType::GamePad);
+}
+
 TEST(PS4, test_report_correct_inputs)
 {
 	std::shared_ptr<HIDReportDescriptor> hid_report_descriptor = std::make_shared<HIDReportDescriptor>(PS4_1, (uint16_t)sizeof(PS4_1));
