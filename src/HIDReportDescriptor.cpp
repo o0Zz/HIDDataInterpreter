@@ -51,6 +51,8 @@
 #define INPUT_Null          0x40
 #define INPUT_Vol           0x80
 
+/* -------------------------------------------------------------------- */
+
 typedef enum class HIDCollectionType
 {
     HID_COLLECTION_PHYSICAL = 0x00,
@@ -74,62 +76,77 @@ public:
     HIDCollectionType m_type;
 };
 
+/* -------------------------------------------------------------------- */
 
 HIDReportDescriptor::HIDReportDescriptor(const uint8_t *hid_report_data, uint16_t hid_report_data_len)
 {
     parse(hid_report_data, hid_report_data_len);
 }
 
+/* -------------------------------------------------------------------- */
 
 HIDReportDescriptor::~HIDReportDescriptor()
 {
 
 }
 
+/* -------------------------------------------------------------------- */
+
 void HIDReportDescriptor::parse(const uint8_t *hid_report_data, uint16_t hid_report_data_len)
 {
     std::vector<std::shared_ptr<HIDItem>> hid_report_items = parseItems(hid_report_data, hid_report_data_len);
 
+    HIDProperty current_property;
     std::shared_ptr<HIDReport> current_report = nullptr;
-    
-    std::vector<HIDInput> current_inputs;
+    std::vector<HIDUsage> current_usages;
     std::shared_ptr<HIDItem> current_usage_page;
     std::stack<std::shared_ptr<HIDCollection>> collection_stack;
 
     //iterate on hid_report_descriptior
     for (std::shared_ptr<HIDItem> item : hid_report_items)
     {
+        if (current_report == nullptr)
+            current_report = std::make_shared<HIDReport>(HIDReportType::Unknown);
+
         switch (item->GetType())
         {
             case HIDItemType::HID_USAGE_PAGE:
             {
-                assert(current_inputs.size() == 0);
-
+                //current_usages.clear();
                 current_usage_page = item;
-                
+
                 if (item->GetValueUint32() == USAGE_PAGE_Button)
                 {
-                    current_inputs.push_back(HIDInput(HIDInputType::Button));
+                    current_usages.push_back(HIDUsage(HIDInputType::Button));
                 }
                 
                 break;
             }
-
+            
             case HIDItemType::HID_USAGE:
             {
-                if (current_usage_page->GetValueUint32() == USAGE_PAGE_GenericDesktop)
+                if (item->GetValueUint32() < (uint32_t)HIDReportType::MAX)
                 {
-                    if (item->GetValueUint32() < (uint32_t)HIDDeviceType::MAX)
-                    {
-                        if (current_report == nullptr)
-                            current_report = std::make_shared<HIDReport>((HIDDeviceType)item->GetValueUint32());
-                    }
-                    else
-                    {
-                        current_inputs.push_back(HIDInput((HIDInputType)item->GetValueUint32()));
-                    }
+                    if (current_report->report_type == HIDReportType::Unknown)
+                        current_report->report_type = (HIDReportType)item->GetValueUint32();
                 }
+                else
+                {
+                    current_usages.push_back(HIDUsage((HIDInputType)item->GetValueUint32()));
+                }
+                break;
+            }
 
+            case HIDItemType::HID_USAGE_MAXIMUM:
+            case HIDItemType::HID_USAGE_MINIMUM:
+            {
+                for (HIDUsage &usage : current_usages)
+                {
+                    if (item->GetType() == HIDItemType::HID_USAGE_MINIMUM)
+                        usage.usage_min = item->GetValueUint32();
+                    else if (item->GetType() == HIDItemType::HID_USAGE_MAXIMUM)
+                        usage.usage_max = item->GetValueUint32();
+                }    
                 break;
             }
             
@@ -148,42 +165,64 @@ void HIDReportDescriptor::parse(const uint8_t *hid_report_data, uint16_t hid_rep
             case HIDItemType::HID_REPORT_SIZE:
             case HIDItemType::HID_REPORT_COUNT:
             {
-                if (current_inputs.size() == 0)
-                    current_inputs.push_back(HIDInput(HIDInputType::Padding));
-
-                for (HIDInput &input : current_inputs)
-                {
-                    if (item->GetType() == HIDItemType::HID_LOGICAL_MINIMUM)
-                        input.logical_min = item->GetValueUint32();
-                    else if (item->GetType() == HIDItemType::HID_LOGICAL_MAXIMUM)
-                        input.logical_max = item->GetValueUint32();
-                    else if (item->GetType() == HIDItemType::HID_PHYSICAL_MINIMUM)
-                        input.physical_min = item->GetValueUint32();
-                    else if (item->GetType() == HIDItemType::HID_PHYSICAL_MAXIMUM)
-                        input.physical_max = item->GetValueUint32();
-                    else if (item->GetType() == HIDItemType::HID_UNIT_EXPONENT)
-                        input.unit_exponent = item->GetValueUint32();
-                    else if (item->GetType() == HIDItemType::HID_UNIT)
-                        input.unit = item->GetValueUint32();
-                    else if (item->GetType() == HIDItemType::HID_REPORT_SIZE)
-                        input.size = item->GetValueUint32();
-                    else if (item->GetType() == HIDItemType::HID_REPORT_COUNT)
-                        input.count = item->GetValueUint32() / (uint32_t)current_inputs.size(); //divide by the number of inputs
-                }
+                if (item->GetType() == HIDItemType::HID_LOGICAL_MINIMUM)
+                    current_property.logical_min = item->GetValueUint32();
+                else if (item->GetType() == HIDItemType::HID_LOGICAL_MAXIMUM)
+                    current_property.logical_max = item->GetValueUint32();
+                else if (item->GetType() == HIDItemType::HID_PHYSICAL_MINIMUM)
+                    current_property.physical_min = item->GetValueUint32();
+                else if (item->GetType() == HIDItemType::HID_PHYSICAL_MAXIMUM)
+                    current_property.physical_max = item->GetValueUint32();
+                else if (item->GetType() == HIDItemType::HID_UNIT_EXPONENT)
+                    current_property.unit_exponent = item->GetValueUint32();
+                else if (item->GetType() == HIDItemType::HID_UNIT)
+                    current_property.unit = item->GetValueUint32();
+                else if (item->GetType() == HIDItemType::HID_REPORT_SIZE)
+                    current_property.size = item->GetValueUint32();
+                else if (item->GetType() == HIDItemType::HID_REPORT_COUNT)
+                    current_property.count = item->GetValueUint32();
+               
                 break;
             }
+
             case HIDItemType::HID_INPUT:
             {
-                current_report->inputs.insert(current_report->inputs.end(), current_inputs.begin(), current_inputs.end());
-                current_inputs.clear();
+                if (current_usages.size() == 0)
+                    current_usages.push_back(HIDUsage(HIDInputType::Padding));
+
+                for (HIDUsage &usage : current_usages)
+                {
+                    HIDInput input = current_property;
+                    input.type = usage.type;
+                    input.count /= (uint32_t)current_usages.size(); //divide by the number of usages
+                    current_report->inputs.push_back(input);
+                }
+
+                current_usages.clear();
                 break;
             }
+
+            /*case HIDItemType::HID_OUTPUT:
+            {
+                for (HIDUsage &usage : current_usages)
+                {
+                    HIDOutput output = current_property;
+                    output.type = usage.type;
+                    output.count /= (uint32_t)current_usages.size(); //divide by the number of usages
+                    current_report->outputs.push_back(output);
+                }
+
+                current_usages.clear();
+                break;
+            }*/
+
                 //For now collections are ignored
             case HIDItemType::HID_COLLECTION:
             {
                 collection_stack.push(std::make_shared<HIDCollection>((HIDCollectionType)(item->GetValueUint32())));
                 break;
             }
+
             case HIDItemType::HID_END_COLLECTION:
             {
                 collection_stack.pop();
@@ -198,18 +237,19 @@ void HIDReportDescriptor::parse(const uint8_t *hid_report_data, uint16_t hid_rep
             }
         }
     }
+
+    assert(current_report == nullptr);
+    assert(collection_stack.size() == 0);    
 }
+
+/* -------------------------------------------------------------------- */
 
 std::vector<std::shared_ptr<HIDItem>> HIDReportDescriptor::parseItems(const uint8_t *hid_report_data, uint16_t hid_report_data_len)
 {
     std::vector<std::shared_ptr<HIDItem>> items;
-    uint16_t offset = 0;
 
-    for (;;)
+    for (uint16_t offset = 0; offset < hid_report_data_len; /* ... */)
     {
-        if (offset >= hid_report_data_len)
-            break;
-
         uint8_t item_type = hid_report_data[offset];
         uint8_t datalen = item_type & HID_LENGTH_MASK;
         if (datalen == 3) datalen = 4;

@@ -20,7 +20,9 @@ FetchContent_MakeAvailable(googletest)
 
 enable_testing() #to discover tests in test explorer 
 
-add_executable(HIDDataInterpreterTests test_double_joystick.cpp) # add this executable
+file(GLOB TEST_FILES ${PROJECT_SOURCE_DIR}/*.cpp)
+
+add_executable(HIDDataInterpreterTests ${TEST_FILES}) # add this executable
 
 target_link_libraries(HIDDataInterpreterTests PRIVATE gtest) # link google test to this executable
 target_link_libraries(HIDDataInterpreterTests PRIVATE HIDDataInterpreterLib)

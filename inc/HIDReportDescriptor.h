@@ -21,9 +21,52 @@ enum class HIDInputType {
     Slider      = 0x36,
     Dial        = 0x37,
     Wheel       = 0x38,
-    Hat_switch  = 0x39
+    HatSwitch  = 0x39
 };
-    
+
+class HIDUsage
+{
+public:
+    HIDUsage(HIDInputType type = HIDInputType::Unknown) : 
+        type(type), 
+        usage_min(0), 
+        usage_max(0)
+        {}
+    ~HIDUsage() {}
+
+    HIDInputType type; //Input type (Button, X, Y, Hat switch, Padding, etc.)
+    uint32_t usage_min;
+    uint32_t usage_max;
+};
+
+class HIDProperty
+{
+public:
+    HIDProperty() : 
+        logical_min(0), 
+        logical_max(0), 
+        physical_min(0), 
+        physical_max(0), 
+        unit(0), 
+        unit_exponent(0), 
+        size(size), 
+        count(count) {}
+    ~HIDProperty() {}
+
+    uint32_t logical_min;
+    uint32_t logical_max;
+    uint32_t physical_min;
+    uint32_t physical_max;
+    uint32_t unit;
+    uint32_t unit_exponent;
+    uint32_t size; //Size of the data in bits
+    uint32_t count; //Number of data items
+
+    bool isComplete() const {
+        return size != 0;
+    }
+};
+
 class HIDInput
 {
 public:
@@ -39,7 +82,31 @@ public:
         count(count) {}
     ~HIDInput() {}
 
-    HIDInputType type; //Input type (ReportID, Button, X, Y, Hat switch, Padding, etc.)
+    //ctor from hidpropery
+    HIDInput(const HIDProperty &p) : 
+        logical_min(p.logical_min), 
+        logical_max(p.logical_max), 
+        physical_min(p.physical_min), 
+        physical_max(p.physical_max), 
+        unit(p.unit), 
+        unit_exponent(p.unit_exponent), 
+        size(p.size), 
+        count(p.count) {}
+
+    HIDInput &operator= (const HIDProperty &p) 
+    {
+        logical_min = p.logical_min;
+        logical_max = p.logical_max;
+        physical_min = p.physical_min;
+        physical_max = p.physical_max;
+        unit = p.unit;
+        unit_exponent = p.unit_exponent;
+        size = p.size;
+        count = p.count;
+        return *this;
+    }
+
+    HIDInputType type; //Input type (Button, X, Y, Hat switch, Padding, etc.)
     uint32_t logical_min;
     uint32_t logical_max;
     uint32_t physical_min;
@@ -119,7 +186,7 @@ private:
 /* -------------------------------------------------------------------------- */
 
 //https://usb.org/sites/default/files/hut1_2.pdf p31
-typedef enum class HIDDeviceType
+typedef enum class HIDReportType
 {
     Unknown = 0x00,
     Pointer = 0x01,
@@ -132,19 +199,22 @@ typedef enum class HIDDeviceType
     Tablet = 0x09,
 
     MAX = 0x2F
-} HIDDeviceType;
+} HIDReportType;
+
 
 class HIDReport
 {
 public:
-    HIDReport(HIDDeviceType device_type = HIDDeviceType::Unknown, uint8_t report_id = 0) :
-        device_type(device_type), 
+    HIDReport(HIDReportType report_type = HIDReportType::Unknown, uint8_t report_id = 0) :
+        report_type(report_type), 
         report_id(report_id) 
     {}
 
-    HIDDeviceType           device_type;
+
+    HIDReportType           report_type;
     uint8_t                 report_id; //Report id 0 means no report id
     std::vector<HIDInput>   inputs;
+    //std::vector<HIDOutput>   outputs;
 };
 
 /* -------------------------------------------------------------------------- */
