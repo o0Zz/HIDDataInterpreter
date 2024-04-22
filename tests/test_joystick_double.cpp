@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include "HIDReportDescriptor.h"
+#include "HIDJoystick.h"
 
 uint8_t double_joystick_hid[] = 
 { //XM-10
@@ -116,4 +117,18 @@ TEST(HID, test_report_has_correct_inputs)
 	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs[3].type, HIDInputType::Padding);
 	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs[4].type, HIDInputType::HatSwitch);
 	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs[5].type, HIDInputType::Padding);
+}
+
+
+TEST(HID, test_input_parsing_button1)
+{
+	uint8_t data[] = {0x01, 0x7F, 0x7F, 0x00, 0x02, 0x00};
+	std::shared_ptr<HIDReportDescriptor> hid_report_descriptor = std::make_shared<HIDReportDescriptor>(double_joystick_hid, (uint16_t)sizeof(double_joystick_hid));
+
+	HIDJoystickData joystick_data;
+	HIDJoystick joystick(hid_report_descriptor);
+	
+	GTEST_ASSERT_EQ(joystick.parseData(data, sizeof(data), &joystick_data), true);
+
+	GTEST_ASSERT_EQ(joystick_data.buttons[0], 1);
 }
