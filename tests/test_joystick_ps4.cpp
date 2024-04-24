@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include "HIDReportDescriptor.h"
 
-const uint8_t PS4_1[507] = {
+const uint8_t PS4_1[] = {
 		0x05, 0x01,        // Usage Page (Generic Desktop Ctrls)
 		0x09, 0x05,        // Usage (Game Pad)
 		0xA1, 0x01,        // Collection (Application)

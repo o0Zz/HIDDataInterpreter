@@ -219,6 +219,8 @@ void HIDReportDescriptor::parse(const uint8_t *hid_report_data, uint16_t hid_rep
                 //For now collections are ignored
             case HIDItemType::HID_COLLECTION:
             {
+                current_usages.clear();
+                
                 collection_stack.push(std::make_shared<HIDCollection>((HIDCollectionType)(item->GetValueUint32())));
                 break;
             }

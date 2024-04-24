@@ -34,7 +34,7 @@ bool HIDJoystick::parseData(uint8_t *data, uint16_t datalen, HIDJoystickData *jo
 
 					if (input.type == HIDInputType::Button)
 					{
-						joystick_data->buttons[i] = value;
+						joystick_data->buttons[joystick_data->button_count] = value;
 						joystick_data->button_count++;
 					}
 					else if (input.type == HIDInputType::X)
