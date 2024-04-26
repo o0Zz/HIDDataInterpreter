@@ -5,6 +5,7 @@
 #include <string>
 #include "HIDReportDescriptor.h"
 
+#define MAX_BUTTONS 32
 class HIDJoystickStick
 {
 	public:
@@ -33,7 +34,7 @@ public:
 	uint8_t index;
 
 	uint8_t button_count;
-	uint8_t buttons[32];
+	uint8_t buttons[MAX_BUTTONS];
 	
 	uint8_t stick_count;
 	HIDJoystickStick sticks[8];

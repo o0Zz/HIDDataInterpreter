@@ -77,22 +77,21 @@ class HIDInput
 public:
     HIDInput(HIDInputType type = HIDInputType::Unknown, uint32_t size=0, uint32_t count=0) : 
         type(type), 
-        size(size), 
-        count(count), 
+        size(size),
+        id(0),
         logical_min(0), 
         logical_max(0), 
         physical_min(0), 
         physical_max(0), 
-        unit(0), 
+        unit(0),
         unit_exponent(0) {}
     ~HIDInput() {}
 
     //ctor from hidpropery
     HIDInput(const HIDProperty &p) : 
-        size(p.size), 
-        count(p.count),
-        logical_min(p.logical_min), 
-        logical_max(p.logical_max), 
+        size(p.size),
+        logical_min(p.logical_min),
+        logical_max(p.logical_max),
         physical_min(p.physical_min), 
         physical_max(p.physical_max), 
         unit(p.unit), 
@@ -101,7 +100,6 @@ public:
     HIDInput &operator= (const HIDProperty &p) 
     {
         size = p.size;
-        count = p.count;
         logical_min = p.logical_min;
         logical_max = p.logical_max;
         physical_min = p.physical_min;
@@ -113,7 +111,7 @@ public:
 
     HIDInputType type; //Input type (Button, X, Y, Hat switch, Padding, etc.)
     uint32_t size; //Size of the data in bits
-    uint32_t count; //Number of data items
+    uint32_t id; //Index of the input in the report
 
     uint32_t logical_min;
     uint32_t logical_max;

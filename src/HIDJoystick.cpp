@@ -27,28 +27,29 @@ bool HIDJoystick::parseData(uint8_t *data, uint16_t datalen, HIDJoystickData *jo
 
 			for (auto input: report->inputs)
 			{
-				for (uint32_t i = 0; i < input.count; i++)
-				{
-					uint32_t value = HIDUtils::readBits(data, bitOffset, input.size);
-					bitOffset += input.size;
+				uint32_t value = HIDUtils::readBits(data, bitOffset, input.size);
+				bitOffset += input.size;
 
-					if (input.type == HIDInputType::Button)
-					{
-						joystick_data->buttons[joystick_data->button_count] = value;
-						joystick_data->button_count++;
-					}
-					else if (input.type == HIDInputType::X)
-					{
-						joystick_data->sticks[i].X = value;
-					}
-					else if (input.type == HIDInputType::Y)
-					{
-						joystick_data->sticks[i].Y = value;
-					}
-					else if (input.type == HIDInputType::Padding)
-					{
-						//Nothing to do
-					}
+				if (input.type == HIDInputType::Button)
+				{
+					if (input.id >= MAX_BUTTONS)
+						return false;
+
+					joystick_data->buttons[input.id] = value;
+					if (joystick_data->button_count < input.id)
+						joystick_data->button_count = input.id;
+				}
+				else if (input.type == HIDInputType::X)
+				{
+					joystick_data->sticks[0].X = value;
+				}
+				else if (input.type == HIDInputType::Y)
+				{
+					joystick_data->sticks[0].Y = value;
+				}
+				else if (input.type == HIDInputType::Padding)
+				{
+					//Nothing to do
 				}
 			}
 

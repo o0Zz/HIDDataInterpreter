@@ -110,13 +110,13 @@ TEST(HID, test_report_ids_for_joysticks)
 TEST(HID, test_report_has_correct_inputs)
 {
 	std::shared_ptr<HIDReportDescriptor> hid_report_descriptor = std::make_shared<HIDReportDescriptor>(double_joystick_hid, (uint16_t)sizeof(double_joystick_hid));
-	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs.size(), 6);
+	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs.size(), 20);
 	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs[0].type, HIDInputType::X);
 	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs[1].type, HIDInputType::Y);
 	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs[2].type, HIDInputType::Button);
-	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs[3].type, HIDInputType::Padding);
-	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs[4].type, HIDInputType::HatSwitch);
-	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs[5].type, HIDInputType::Padding);
+	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs[17].type, HIDInputType::Padding);
+	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs[18].type, HIDInputType::HatSwitch);
+	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs[19].type, HIDInputType::Padding);
 }
 
 

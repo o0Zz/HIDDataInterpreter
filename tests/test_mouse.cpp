@@ -66,11 +66,11 @@ TEST(MOUSE, test_report_is_mouse)
 TEST(MOUSE, test_report_correct_inputs)
 {
 	std::shared_ptr<HIDReportDescriptor> hid_report_descriptor = std::make_shared<HIDReportDescriptor>(RAZER_VIPER_ULTIMATE_1, (uint16_t)sizeof(RAZER_VIPER_ULTIMATE_1));
-	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs.size(), 6);
+	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs.size(), 13);
 	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs[0].type, HIDInputType::Button);
-	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs[1].type, HIDInputType::Padding);
-	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs[2].type, (HIDInputType)0x40);
-	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs[3].type, HIDInputType::Wheel);
-	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs[4].type, HIDInputType::X);
-	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs[5].type, HIDInputType::Y);
+	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs[5].type, HIDInputType::Padding);
+	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs[8].type, (HIDInputType)0x40);
+	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs[10].type, HIDInputType::Wheel);
+	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs[11].type, HIDInputType::X);
+	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs[12].type, HIDInputType::Y);
 }

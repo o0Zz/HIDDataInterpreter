@@ -112,20 +112,18 @@ void HIDReportDescriptor::parse(const uint8_t *hid_report_data, uint16_t hid_rep
         {
             case HIDItemType::HID_USAGE_PAGE:
             {
-                //current_usages.clear();
                 current_usage_page = item;
-
-                if (item->GetValueUint32() == USAGE_PAGE_Button)
-                {
-                    current_usages.push_back(HIDUsage(HIDInputType::Button));
-                }
-                
                 break;
             }
             
             case HIDItemType::HID_USAGE:
             {
-                if (item->GetValueUint32() < (uint32_t)HIDReportType::MAX)
+                if (current_usage_page->GetValueUint32() == USAGE_PAGE_Button)
+                {
+                    current_usages.push_back(HIDInputType::Button);
+                    current_usages.back().usage_min = item->GetValueUint32();
+                }
+                else if (item->GetValueUint32() < (uint32_t)HIDReportType::MAX)
                 {
                     if (current_report->report_type == HIDReportType::Unknown)
                         current_report->report_type = (HIDReportType)item->GetValueUint32();
@@ -140,19 +138,26 @@ void HIDReportDescriptor::parse(const uint8_t *hid_report_data, uint16_t hid_rep
             case HIDItemType::HID_USAGE_MAXIMUM:
             case HIDItemType::HID_USAGE_MINIMUM:
             {
+                if (current_usage_page->GetValueUint32() == USAGE_PAGE_Button)
+                {
+                    if (current_usages.size() == 0)
+                        current_usages.push_back(HIDInputType::Button);
+                }    
+                
                 for (HIDUsage &usage : current_usages)
                 {
                     if (item->GetType() == HIDItemType::HID_USAGE_MINIMUM)
                         usage.usage_min = item->GetValueUint32();
                     else if (item->GetType() == HIDItemType::HID_USAGE_MAXIMUM)
                         usage.usage_max = item->GetValueUint32();
-                }    
+                } 
                 break;
             }
             
             case HIDItemType::HID_REPORT_ID:
             {
-                current_report->report_id = item->GetValueUint32();
+                if (current_report->report_id == 0)
+                    current_report->report_id = item->GetValueUint32();
                 break;
             }
 
@@ -192,12 +197,17 @@ void HIDReportDescriptor::parse(const uint8_t *hid_report_data, uint16_t hid_rep
 
                 for (HIDUsage &usage : current_usages)
                 {
-                    HIDInput input = current_property;
-                    input.type = usage.type;
-                    input.count /= (uint32_t)current_usages.size(); //divide by the number of usages
-                    current_report->inputs.push_back(input);
+                    assert((current_property.count == current_usages.size()) || (current_usages.size() == 1));
+                    
+                    uint32_t count = current_property.count / (uint32_t)current_usages.size();
+                    for (uint32_t i = 0; i < count; i++)
+                    {
+                        HIDInput input = current_property;
+                        input.type = usage.type;
+                        input.id = usage.usage_min + i;
+                        current_report->inputs.push_back(input);
+                    }
                 }
-
                 current_usages.clear();
                 break;
             }

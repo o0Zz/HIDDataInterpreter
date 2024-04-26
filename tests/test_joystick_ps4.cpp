@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include "HIDReportDescriptor.h"
+#include <HIDJoystick.h>
 
 const uint8_t PS4_1[] = {
 		0x05, 0x01,        // Usage Page (Generic Desktop Ctrls)
@@ -271,15 +272,64 @@ TEST(PS4, test_report_is_gamepad)
 TEST(PS4, test_report_correct_inputs)
 {
 	std::shared_ptr<HIDReportDescriptor> hid_report_descriptor = std::make_shared<HIDReportDescriptor>(PS4_1, (uint16_t)sizeof(PS4_1));
-	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs.size(), 10);
+	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs.size(), 76);
+	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->report_id, 1);
 	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs[0].type, HIDInputType::X);
 	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs[1].type, HIDInputType::Y);
 	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs[2].type, HIDInputType::Z);
 	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs[3].type, HIDInputType::Rz);
 	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs[4].type, HIDInputType::HatSwitch);
 	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs[5].type, HIDInputType::Button);
-	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs[6].type, HIDInputType::Padding);
-	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs[7].type, HIDInputType::Rx);
-	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs[8].type, HIDInputType::Ry);
-	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs[9].type, HIDInputType::Padding);
+	// Buttons are ignored
+	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs[19].type, HIDInputType::Padding);
+	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs[20].type, HIDInputType::Rx);
+	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs[21].type, HIDInputType::Ry);
+	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs[22].type, HIDInputType::Padding);
+	// Padding is ignored
 }
+
+
+TEST(PS4, test_input_parsing_button1)
+{
+	uint8_t data[] = {	
+		0x01, 0x83, 0x79, 0x84, 0x80, 0x18, 0x00, 0x50, 0x00, 0x00, 0xb5, 0xe0, 0xfe, 0xfa, 0xff, 
+		0xfc, 0xff, 0xff, 0xff, 0x3e, 0xf2, 0x4b, 0x17, 0x0e, 0xef, 0x00, 0x00, 0x00, 0x00, 0x00, 
+		0x16, 0x00, 0x00, 0x01, 0xc0, 0x81, 0xd3, 0x86, 0x02, 0x80, 0x00, 0x00, 0x00, 0x00, 0x80, 
+		0x00, 0x00, 0x00, 0x80, 0x00, 0x00, 0x00, 0x00, 0x80, 0x00, 0x00, 0x00, 0x80, 0x00, 0x00, 
+		0x00, 0x00, 0x80, 0x00
+		};
+
+	std::shared_ptr<HIDReportDescriptor> hid_report_descriptor = std::make_shared<HIDReportDescriptor>(PS4_1, (uint16_t)sizeof(PS4_1));
+
+	HIDJoystickData joystick_data;
+	HIDJoystick joystick(hid_report_descriptor);
+	
+	GTEST_ASSERT_EQ(joystick.parseData(data, sizeof(data), &joystick_data), true);
+
+	GTEST_ASSERT_EQ(joystick_data.buttons[1], 1);
+}
+
+TEST(PS4, test_input_parsing_left)
+{
+	uint8_t data[] = {	
+		0x01, 0x00, 0x5b, 0x82, 0x7f, 0x08, 0x00, 0xcc, 0x00, 0x00, 0x17, 0x74, 0x07, 0xee, 0xff, 
+		0x01, 0x00, 0xfa, 0xff, 0xc2, 0xef, 0x69, 0x1a, 0x46, 0xfa, 0x00, 0x00, 0x00, 0x00, 0x00, 
+		0x16, 0x00, 0x00, 0x01, 0x10, 0x82, 0xb7, 0x01, 0x26, 0x80, 0x00, 0x00, 0x00, 0x00, 0x80, 
+		0x00, 0x00, 0x00, 0x80, 0x00, 0x00, 0x00, 0x00, 0x80, 0x00, 0x00, 0x00, 0x80, 0x00, 0x00, 
+		0x00, 0x00, 0x80, 0x00
+	};
+
+	std::shared_ptr<HIDReportDescriptor> hid_report_descriptor = std::make_shared<HIDReportDescriptor>(PS4_1, (uint16_t)sizeof(PS4_1));
+
+	HIDJoystickData joystick_data;
+	HIDJoystick joystick(hid_report_descriptor);
+	
+	GTEST_ASSERT_EQ(joystick.parseData(data, sizeof(data), &joystick_data), true);
+
+	GTEST_ASSERT_EQ(joystick_data.sticks[0].X, 0);
+}
+
+
+
+
+
