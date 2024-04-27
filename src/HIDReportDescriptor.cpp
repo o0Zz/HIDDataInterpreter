@@ -27,6 +27,7 @@
 #define USAGE_PAGE_Ordinal              0x0A
 #define USAGE_PAGE_Telephony            0x0B
 #define USAGE_PAGE_Consumer             0x0C
+#define USAGE_PAGE_VendorDefined        0xFF00
 
 //---------------USAGE-----------------
 
@@ -96,6 +97,7 @@ void HIDReportDescriptor::parse(const uint8_t *hid_report_data, uint16_t hid_rep
 {
     std::vector<std::shared_ptr<HIDItem>> hid_report_items = parseItems(hid_report_data, hid_report_data_len);
 
+    uint32_t current_report_id = 0;
     HIDProperty current_property;
     std::shared_ptr<HIDReport> current_report = nullptr;
     std::vector<HIDUsage> current_usages;
@@ -120,17 +122,23 @@ void HIDReportDescriptor::parse(const uint8_t *hid_report_data, uint16_t hid_rep
             {
                 if (current_usage_page->GetValueUint32() == USAGE_PAGE_Button)
                 {
-                    current_usages.push_back(HIDInputType::Button);
-                    current_usages.back().usage_min = item->GetValueUint32();
+                    current_usages.push_back(HIDUsage(HIDUsageType::Button, item->GetValueUint32())); //strange to have button in usage ?
                 }
-                else if (item->GetValueUint32() < (uint32_t)HIDReportType::MAX)
+                else if (current_usage_page->GetValueUint32() == USAGE_PAGE_GenericDesktop)
                 {
-                    if (current_report->report_type == HIDReportType::Unknown)
-                        current_report->report_type = (HIDReportType)item->GetValueUint32();
+                    if (item->GetValueUint32() < (uint32_t)HIDReportType::MAX)
+                    {
+                        if (current_report->report_type == HIDReportType::Unknown)
+                            current_report->report_type = (HIDReportType)item->GetValueUint32();
+                    }
+                    else
+                    {
+                        current_usages.push_back(HIDUsage(HIDUsageType::GenericDesktop, item->GetValueUint32()));
+                    }
                 }
-                else
+                else if (current_usage_page->GetValueUint32() == USAGE_PAGE_VendorDefined)
                 {
-                    current_usages.push_back(HIDUsage((HIDInputType)item->GetValueUint32()));
+                    current_usages.push_back(HIDUsage(HIDUsageType::VendorDefined, item->GetValueUint32()));
                 }
                 break;
             }
@@ -141,7 +149,7 @@ void HIDReportDescriptor::parse(const uint8_t *hid_report_data, uint16_t hid_rep
                 if (current_usage_page->GetValueUint32() == USAGE_PAGE_Button)
                 {
                     if (current_usages.size() == 0)
-                        current_usages.push_back(HIDInputType::Button);
+                        current_usages.push_back(HIDUsage(HIDUsageType::Button));
                 }    
                 
                 for (HIDUsage &usage : current_usages)
@@ -156,8 +164,7 @@ void HIDReportDescriptor::parse(const uint8_t *hid_report_data, uint16_t hid_rep
             
             case HIDItemType::HID_REPORT_ID:
             {
-                if (current_report->report_id == 0)
-                    current_report->report_id = item->GetValueUint32();
+                current_report_id = item->GetValueUint32();
                 break;
             }
 
@@ -191,9 +198,29 @@ void HIDReportDescriptor::parse(const uint8_t *hid_report_data, uint16_t hid_rep
             }
 
             case HIDItemType::HID_INPUT:
+            case HIDItemType::HID_OUTPUT:
+            case HIDItemType::HID_FEATURE:
             {
+                std::vector<HIDIOBlock> *ioblocks;
+                
+                if (item->GetType() == HIDItemType::HID_INPUT)
+                    ioblocks = &current_report->inputs;
+                else if (item->GetType() == HIDItemType::HID_OUTPUT)
+                    ioblocks = &current_report->outputs;
+                else if (item->GetType() == HIDItemType::HID_FEATURE)
+                    ioblocks = &current_report->features;
+
+                if (ioblocks->size() == 0 || current_report_id != 0)
+                    ioblocks->push_back(HIDIOBlock()); //Create a new block of data because report id changed or no block of data
+
+                if (current_report_id != 0)
+                {
+                    ioblocks->back().data.push_back(HIDInputOutput(HIDIOType::ReportId, 8, current_report_id));
+                    current_report_id = 0;
+                }
+
                 if (current_usages.size() == 0)
-                    current_usages.push_back(HIDUsage(HIDInputType::Padding));
+                    current_usages.push_back(HIDUsage(HIDUsageType::Padding));
 
                 for (HIDUsage &usage : current_usages)
                 {
@@ -202,29 +229,12 @@ void HIDReportDescriptor::parse(const uint8_t *hid_report_data, uint16_t hid_rep
                     uint32_t count = current_property.count / (uint32_t)current_usages.size();
                     for (uint32_t i = 0; i < count; i++)
                     {
-                        HIDInput input = current_property;
-                        input.type = usage.type;
-                        input.id = usage.usage_min + i;
-                        current_report->inputs.push_back(input);
+                        ioblocks->back().data.push_back(HIDInputOutput(usage, current_property, i));
                     }
                 }
                 current_usages.clear();
                 break;
             }
-
-            /*case HIDItemType::HID_OUTPUT:
-            {
-                for (HIDUsage &usage : current_usages)
-                {
-                    HIDOutput output = current_property;
-                    output.type = usage.type;
-                    output.count /= (uint32_t)current_usages.size(); //divide by the number of usages
-                    current_report->outputs.push_back(output);
-                }
-
-                current_usages.clear();
-                break;
-            }*/
 
                 //For now collections are ignored
             case HIDItemType::HID_COLLECTION:

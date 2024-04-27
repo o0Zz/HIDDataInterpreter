@@ -6,40 +6,47 @@
 
 /* -------------------------------------------------------------------------- */
 
-enum class HIDInputType {
+enum class HIDUsageType 
+{
+    Unknown = 0x00,
+    ReportId,
+    Padding,
+    Button,
+    GenericDesktop,
+    VendorDefined
+};
 
-    Unknown     = 0x00, 
-    Padding     = 0x01,
-    Button      = 0x02,
-    
+enum class HIDUsageGenericDesktopSubType 
+{
     X           = 0x30,
     Y           = 0x31,
     Z           = 0x32,
     Rx          = 0x33,
     Ry          = 0x34,
     Rz          = 0x35,
-    Slider      = 0x36,
-    Dial        = 0x37,
     Wheel       = 0x38,
     HatSwitch   = 0x39,
-    Counted     = 0x3A,
-    ByteCount   = 0x3B,
-    MotionWakeup= 0x3C,
-    Start       = 0x3D,
-    Select      = 0x3E
 };
 
 class HIDUsage
 {
 public:
-    HIDUsage(HIDInputType type = HIDInputType::Unknown) : 
+    HIDUsage(HIDUsageType type, uint32_t sub_type = 0) : 
         type(type), 
+        sub_type(sub_type),
         usage_min(0), 
         usage_max(0)
-        {}
+        {
+            if (sub_type != 0)
+            {
+                usage_min = sub_type;
+                usage_max = sub_type;
+            }
+        }
     ~HIDUsage() {}
 
-    HIDInputType type; //Input type (Button, X, Y, Hat switch, Padding, etc.)
+    HIDUsageType type; //Input type (Button, X, Y, Hat switch, Padding, etc.)
+    uint32_t sub_type; //Sub type (Button number, etc.)
     uint32_t usage_min;
     uint32_t usage_max;
 };
@@ -66,50 +73,94 @@ public:
     uint32_t unit_exponent;
     uint32_t size; //Size of the data in bits
     uint32_t count; //Number of data items
-
-    bool isComplete() const {
-        return size != 0;
-    }
 };
 
-class HIDInput
+enum class HIDIOType 
+{
+    Unknown = 0x00,
+    ReportId,
+    VendorDefined,
+    Padding,
+    Button,
+    X,
+    Y,
+    Z,
+    Rx,
+    Ry,
+    Rz,
+    HatSwitch,
+    Wheel
+};
+
+class HIDInputOutput
 {
 public:
-    HIDInput(HIDInputType type = HIDInputType::Unknown, uint32_t size=0, uint32_t count=0) : 
+    HIDInputOutput(HIDIOType type = HIDIOType::Unknown, uint32_t size=0, uint32_t id=0) : 
         type(type), 
+        sub_type(0),
         size(size),
-        id(0),
+        id(id),
         logical_min(0), 
         logical_max(0), 
         physical_min(0), 
         physical_max(0), 
         unit(0),
         unit_exponent(0) {}
-    ~HIDInput() {}
+    ~HIDInputOutput() {}
 
     //ctor from hidpropery
-    HIDInput(const HIDProperty &p) : 
+    HIDInputOutput(const HIDUsage &usage, const HIDProperty &p, uint32_t idx) : 
+        type(HIDIOType::Unknown),
+        sub_type(0),
         size(p.size),
+        id(0),
         logical_min(p.logical_min),
         logical_max(p.logical_max),
         physical_min(p.physical_min), 
         physical_max(p.physical_max), 
         unit(p.unit), 
-        unit_exponent(p.unit_exponent) {}
+        unit_exponent(p.unit_exponent) 
+        {           
+            if (usage.type == HIDUsageType::GenericDesktop)
+            {
+                if (usage.sub_type == (uint32_t)HIDUsageGenericDesktopSubType::X)
+                    this->type = HIDIOType::X;
+                else if (usage.sub_type == (uint32_t)HIDUsageGenericDesktopSubType::Y)
+                    this->type = HIDIOType::Y;
+                else if (usage.sub_type == (uint32_t)HIDUsageGenericDesktopSubType::Z)
+                    this->type = HIDIOType::Z;
+                else if (usage.sub_type == (uint32_t)HIDUsageGenericDesktopSubType::Rx)
+                    this->type = HIDIOType::Rx;
+                else if (usage.sub_type == (uint32_t)HIDUsageGenericDesktopSubType::Ry)
+                    this->type = HIDIOType::Ry;
+                else if (usage.sub_type == (uint32_t)HIDUsageGenericDesktopSubType::Rz)
+                    this->type = HIDIOType::Rz;
+                else if (usage.sub_type == (uint32_t)HIDUsageGenericDesktopSubType::HatSwitch)
+                    this->type = HIDIOType::HatSwitch;
+                else if (usage.sub_type == (uint32_t)HIDUsageGenericDesktopSubType::Wheel)
+                    this->type = HIDIOType::Wheel;
+            }
+            else if (usage.type == HIDUsageType::Button)
+                this->type = HIDIOType::Button;
+            else if (usage.type == HIDUsageType::ReportId)
+                this->type = HIDIOType::ReportId;
+            else if (usage.type == HIDUsageType::Padding)
+                this->type = HIDIOType::Padding;
+            else if (usage.type == HIDUsageType::VendorDefined)
+            {
+                this->type = HIDIOType::VendorDefined;
+                this->sub_type = usage.sub_type;
+            }
+            else
+            {
+                this->type = HIDIOType::Unknown;
+                this->sub_type = usage.sub_type;
+            }
+            this->id = usage.usage_min + idx;
+        }
 
-    HIDInput &operator= (const HIDProperty &p) 
-    {
-        size = p.size;
-        logical_min = p.logical_min;
-        logical_max = p.logical_max;
-        physical_min = p.physical_min;
-        physical_max = p.physical_max;
-        unit = p.unit;
-        unit_exponent = p.unit_exponent;
-        return *this;
-    }
-
-    HIDInputType type; //Input type (Button, X, Y, Hat switch, Padding, etc.)
+    HIDIOType type; //Type (Button, X, Y, Hat switch, Padding, etc.)
+    uint32_t sub_type; //Sub type (Usefull for vendor defined and non handled types)
     uint32_t size; //Size of the data in bits
     uint32_t id; //Index of the input in the report
 
@@ -119,10 +170,6 @@ public:
     uint32_t physical_max;
     uint32_t unit;
     uint32_t unit_exponent;
-
-    bool isComplete() const {
-        return size != 0;
-    }
 };
 
 /* -------------------------------------------------------------------------- */
@@ -205,20 +252,26 @@ typedef enum class HIDReportType
     MAX = 0x2F
 } HIDReportType;
 
+class HIDIOBlock
+{
+public:
+    HIDIOBlock() {}
+    ~HIDIOBlock() {}
+
+    std::vector<HIDInputOutput> data;
+};
 
 class HIDReport
 {
 public:
-    HIDReport(HIDReportType report_type = HIDReportType::Unknown, uint8_t report_id = 0) :
-        report_type(report_type), 
-        report_id(report_id) 
+    HIDReport(HIDReportType report_type = HIDReportType::Unknown) :
+        report_type(report_type)
     {}
 
-
     HIDReportType           report_type;
-    uint8_t                 report_id; //Report id 0 means no report id
-    std::vector<HIDInput>   inputs;
-    //std::vector<HIDOutput>   outputs;
+    std::vector<HIDIOBlock> inputs;
+    std::vector<HIDIOBlock> outputs;
+    std::vector<HIDIOBlock> features;
 };
 
 /* -------------------------------------------------------------------------- */

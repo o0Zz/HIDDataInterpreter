@@ -20,17 +20,19 @@ bool HIDJoystick::parseData(uint8_t *data, uint16_t datalen, HIDJoystickData *jo
 
 	for (auto report: descriptor->GetReports())
 	{
-		if (report->report_id == 0 || report->report_id == data[0])
+		for (auto inputblock: report->inputs)
 		{
-			if (report->report_id != 0)
-				bitOffset = 8;
-
-			for (auto input: report->inputs)
+			for (auto input: inputblock.data)
 			{
 				uint32_t value = HIDUtils::readBits(data, bitOffset, input.size);
 				bitOffset += input.size;
 
-				if (input.type == HIDInputType::Button)
+				if (input.type == HIDIOType::ReportId)
+				{
+					if (value != input.id)
+						break; //Not the correct report id
+				}
+				else if (input.type == HIDIOType::Button)
 				{
 					if (input.id >= MAX_BUTTONS)
 						return false;
@@ -39,22 +41,23 @@ bool HIDJoystick::parseData(uint8_t *data, uint16_t datalen, HIDJoystickData *jo
 					if (joystick_data->button_count < input.id)
 						joystick_data->button_count = input.id;
 				}
-				else if (input.type == HIDInputType::X)
+				else if (input.type == HIDIOType::X)
 				{
 					joystick_data->sticks[0].X = value;
 				}
-				else if (input.type == HIDInputType::Y)
+				else if (input.type == HIDIOType::Y)
 				{
 					joystick_data->sticks[0].Y = value;
 				}
-				else if (input.type == HIDInputType::Padding)
+				else if (input.type == HIDIOType::Padding || input.type == HIDIOType::Unknown)
 				{
 					//Nothing to do
 				}
 			}
-
-			return true;
 		}
+
+		return true;
+
 	}
 	return false;
 }
