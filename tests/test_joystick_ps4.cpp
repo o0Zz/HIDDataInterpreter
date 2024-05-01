@@ -272,19 +272,24 @@ TEST(PS4, test_report_is_gamepad)
 TEST(PS4, test_report_correct_inputs)
 {
 	std::shared_ptr<HIDReportDescriptor> hid_report_descriptor = std::make_shared<HIDReportDescriptor>(PS4_1, (uint16_t)sizeof(PS4_1));
-	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs.size(), 76);
-	/*GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->report_id, 1);
-	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs[0].type, HIDInputType::X);
-	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs[1].type, HIDInputType::Y);
-	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs[2].type, HIDInputType::Z);
-	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs[3].type, HIDInputType::Rz);
-	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs[4].type, HIDInputType::HatSwitch);
-	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs[5].type, HIDInputType::Button);
+	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs.data.size(), 77);
+	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs.data[0].type, HIDIOType::ReportId);
+	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs.data[1].type, HIDIOType::X);
+	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs.data[2].type, HIDIOType::Y);
+	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs.data[3].type, HIDIOType::Z);
+	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs.data[4].type, HIDIOType::Rz);
+	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs.data[5].type, HIDIOType::Button);
+	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs.data[6].type, HIDIOType::Button);
+	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs.data[7].type, HIDIOType::Button);
+	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs.data[8].type, HIDIOType::Button);
+	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs.data[9].type, HIDIOType::HatSwitch);
 	// Buttons are ignored
-	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs[19].type, HIDInputType::Padding);
-	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs[20].type, HIDInputType::Rx);
-	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs[21].type, HIDInputType::Ry);
-	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs[22].type, HIDInputType::Padding);*/
+	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs.data[18].type, HIDIOType::VendorDefined);
+	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs.data[19].type, HIDIOType::Button);
+	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs.data[20].type, HIDIOType::Button);
+	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs.data[21].type, HIDIOType::Rx);
+	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs.data[22].type, HIDIOType::Ry);
+	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs.data[23].type, HIDIOType::VendorDefined);
 	// Padding is ignored
 }
 
@@ -331,5 +336,15 @@ TEST(PS4, test_input_parsing_left)
 
 
 
+//hat up
+//01 82 7a 82 80 00 00 bc00007205fff2ff0100f8ff59015b1fec05000000000016000000008000000080000000008000000080000000008000000080000000008000
 
+//botom
+//01 83 79 82 80 04 00440000d77b01f2ff0300fbff7501641ff005000000000016000000008000000080000000008000000080000000008000000080000000008000
 
+//hat not pressed
+//01 83 79 82 80 08 006400004e4501f0ff0100f8ff5f014e1ff105000000000016000000008000000080000000008000000080000000008000000080000000008000
+//01 82 7a 81 80 08 00 e80000f746fff0ff0000f8ff6a014a1ffa05000000000016000000008000000080000000008000000080000000008000000080000000008000
+
+//left
+//01 82 78 82 80 06 000c000011ba01f0ff0100f8ff7b013f1fee05000000000016000000008000000080000000008000000080000000008000000080000000008000

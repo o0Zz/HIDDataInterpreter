@@ -1,81 +1,85 @@
 #include "HIDReportDescriptor.h"
+#include "HIDReportDescriptorElements.h"
+#include "HIDReportDescriptorUsages.h"
 #include <iostream>
 #include <vector>
 #include <memory>
 #include <stack>
 #include <cassert>
-
-//https://docs.kernel.org/hid/hidreport-parsing.html
-#define HID_FUNC_TYPE_MASK 0xFC
-#define HID_TYPE_MASK 0x0C
-#define HID_LENGTH_MASK 0x03
+#include <algorithm>
 
 //https://github.com/pasztorpisti/hid-report-parser/blob/master/src/hid_report_parser.cpp
 //https://docs.kernel.org/hid/hidintro.html
 
-//---------------USAGE_PAGE-----------------
-
-#define USAGE_PAGE_GenericDesktop       0x01
-#define USAGE_PAGE_Simulation           0x02
-#define USAGE_PAGE_VR                   0x03
-#define USAGE_PAGE_Sport                0x04
-#define USAGE_PAGE_Game                 0x05
-#define USAGE_PAGE_GenericDevice        0x06
-#define USAGE_PAGE_Keyboard             0x07
-#define USAGE_PAGE_LEDs                 0x08
-#define USAGE_PAGE_Button               0x09
-#define USAGE_PAGE_Ordinal              0x0A
-#define USAGE_PAGE_Telephony            0x0B
-#define USAGE_PAGE_Consumer             0x0C
-#define USAGE_PAGE_VendorDefined        0xFF00
-
-//---------------USAGE-----------------
-
-#define USAGE_X             0x30
-#define USAGE_Y             0x31
-#define USAGE_Z             0x32
-#define USAGE_Rx            0x33
-#define USAGE_Ry            0x34
-#define USAGE_Rz            0x35
-#define USAGE_Slider        0x36
-#define USAGE_Dial          0x37
-#define USAGE_Wheel         0x38
-#define USAGE_Hat_switch    0x39
-
-//---------------INPUT-----------------
-#define INPUT_Const         0x01
-#define INPUT_Var           0x02
-#define INPUT_Rel           0x04
-#define INPUT_Wrap          0x08
-#define INPUT_NLin          0x10
-#define INPUT_NPrf          0x20
-#define INPUT_Null          0x40
-#define INPUT_Vol           0x80
-
-/* -------------------------------------------------------------------- */
-
-typedef enum class HIDCollectionType
+HIDInputOutput::HIDInputOutput(HIDIOType type, uint32_t size, uint32_t id) : 
+    type(type), 
+    sub_type(0),
+    size(size),
+    id(id),
+    logical_min(0), 
+    logical_max(0), 
+    physical_min(0), 
+    physical_max(0), 
+    unit(0),
+    unit_exponent(0) 
 {
-    HID_COLLECTION_PHYSICAL = 0x00,
-    HID_COLLECTION_APPLICATION = 0x01,
-    HID_COLLECTION_LOGICAL = 0x02,
-    HID_COLLECTION_REPORT = 0x03,
-    HID_COLLECTION_NAMED_ARRAY = 0x04,
-    HID_COLLECTION_USAGE_SWITCH = 0x05,
-    HID_COLLECTION_USAGE_MODIFIER = 0x06
-} HIDCollectionType;
 
-class HIDCollection
+}
+
+HIDInputOutput::~HIDInputOutput()
 {
-public:
-    HIDCollection(HIDCollectionType type) :
-        m_type(type)
+
+}
+
+HIDInputOutput::HIDInputOutput(const HIDUsage &usage, uint32_t idx) : 
+    type(HIDIOType::Unknown),
+    sub_type(0),
+    size(usage.property.size),
+    id(0),
+    logical_min(usage.property.logical_min),
+    logical_max(usage.property.logical_max),
+    physical_min(usage.property.physical_min), 
+    physical_max(usage.property.physical_max), 
+    unit(usage.property.unit), 
+    unit_exponent(usage.property.unit_exponent) 
+{           
+    if (usage.type == HIDUsageType::GenericDesktop)
     {
+        if (usage.sub_type == (uint32_t)HIDUsageGenericDesktopSubType::X)
+            this->type = HIDIOType::X;
+        else if (usage.sub_type == (uint32_t)HIDUsageGenericDesktopSubType::Y)
+            this->type = HIDIOType::Y;
+        else if (usage.sub_type == (uint32_t)HIDUsageGenericDesktopSubType::Z)
+            this->type = HIDIOType::Z;
+        else if (usage.sub_type == (uint32_t)HIDUsageGenericDesktopSubType::Rx)
+            this->type = HIDIOType::Rx;
+        else if (usage.sub_type == (uint32_t)HIDUsageGenericDesktopSubType::Ry)
+            this->type = HIDIOType::Ry;
+        else if (usage.sub_type == (uint32_t)HIDUsageGenericDesktopSubType::Rz)
+            this->type = HIDIOType::Rz;
+        else if (usage.sub_type == (uint32_t)HIDUsageGenericDesktopSubType::HatSwitch)
+            this->type = HIDIOType::HatSwitch;
+        else if (usage.sub_type == (uint32_t)HIDUsageGenericDesktopSubType::Wheel)
+            this->type = HIDIOType::Wheel;
     }
-    ~HIDCollection() {}
-
-    HIDCollectionType m_type;
-};
+    else if (usage.type == HIDUsageType::Button)
+        this->type = HIDIOType::Button;
+    else if (usage.type == HIDUsageType::ReportId)
+        this->type = HIDIOType::ReportId;
+    else if (usage.type == HIDUsageType::Padding)
+        this->type = HIDIOType::Padding;
+    else if (usage.type == HIDUsageType::VendorDefined)
+    {
+        this->type = HIDIOType::VendorDefined;
+        this->sub_type = usage.sub_type;
+    }
+    else
+    {
+        this->type = HIDIOType::Unknown;
+        this->sub_type = usage.sub_type;
+    }
+    this->id = usage.usage_min + idx;
+}
 
 /* -------------------------------------------------------------------- */
 
@@ -95,192 +99,68 @@ HIDReportDescriptor::~HIDReportDescriptor()
 
 void HIDReportDescriptor::parse(const uint8_t *hid_report_data, uint16_t hid_report_data_len)
 {
-    std::vector<std::shared_ptr<HIDItem>> hid_report_items = parseItems(hid_report_data, hid_report_data_len);
+    std::vector<HIDUsage> hid_report_usage = HIDReportDescriptorUsages::parse(HIDReportDescriptorElements::parse(hid_report_data, hid_report_data_len));
 
-    uint32_t current_report_id = 0;
-    HIDProperty current_property;
-    std::shared_ptr<HIDReport> current_report = nullptr;
-    std::vector<HIDUsage> current_usages;
-    std::shared_ptr<HIDItem> current_usage_page;
-    std::stack<std::shared_ptr<HIDCollection>> collection_stack;
+    std::vector<HIDInputOutput> current_data;
+    uint32_t current_size = 0;
 
-    //iterate on hid_report_descriptior
-    for (std::shared_ptr<HIDItem> item : hid_report_items)
+    for (size_t k = 0; k < hid_report_usage.size(); k++)
     {
-        if (current_report == nullptr)
-            current_report = std::make_shared<HIDReport>(HIDReportType::Unknown);
+        HIDIOBlock *ioblocks = NULL;
+        HIDUsage &usage = hid_report_usage[k];
 
-        switch (item->GetType())
+        if (usage.type == HIDUsageType::GenericDesktop)
         {
-            case HIDItemType::HID_USAGE_PAGE:
+            if (((HIDUsageGenericDesktopSubType)usage.sub_type) < HIDUsageGenericDesktopSubType::InputTypeEnd 
+                && ((HIDUsageGenericDesktopSubType)usage.sub_type) != HIDUsageGenericDesktopSubType::Pointer)
             {
-                current_usage_page = item;
-                break;
+                m_reports.push_back(std::make_shared<HIDReport>((HIDReportType)usage.sub_type));
             }
-            
-            case HIDItemType::HID_USAGE:
+        }
+
+        if (m_reports.size() == 0)
+            continue;
+
+        if (usage.io_type == HIDUsageIOType::Input)
+            ioblocks = &m_reports.back()->inputs;
+        else if (usage.io_type == HIDUsageIOType::Output)
+            ioblocks = &m_reports.back()->outputs;
+        else if (usage.io_type == HIDUsageIOType::Feature)
+            ioblocks = &m_reports.back()->features;
+        else
+            continue;
+
+        for (uint32_t i = 0; i < usage.property.count; i++)
+        {
+            current_data.push_back(HIDInputOutput(usage, i));
+            current_size += usage.property.size;
+        }
+
+            //If we read enough data to have a complete byte, we can reorder them and add it to the data
+        if (current_size%8 == 0)
+        {
+            std::vector<HIDInputOutput> ordered_current_data;
+
+            uint32_t data_len = 0;
+            for (size_t i = 0; i < current_data.size(); i++)
             {
-                if (current_usage_page->GetValueUint32() == USAGE_PAGE_Button)
+                ordered_current_data.push_back(current_data[i]);
+                data_len += current_data[i].size;
+
+                //reverse 8 by 8
+                if (data_len >= 8)
                 {
-                    current_usages.push_back(HIDUsage(HIDUsageType::Button, item->GetValueUint32())); //strange to have button in usage ?
+                    std::reverse(ordered_current_data.begin(), ordered_current_data.end());
+                    ioblocks->data.insert(ioblocks->data.end(), ordered_current_data.begin(), ordered_current_data.end());
+                    ordered_current_data.clear();
+                    data_len = 0;
                 }
-                else if (current_usage_page->GetValueUint32() == USAGE_PAGE_GenericDesktop)
-                {
-                    if (item->GetValueUint32() < (uint32_t)HIDReportType::MAX)
-                    {
-                        if (current_report->report_type == HIDReportType::Unknown)
-                            current_report->report_type = (HIDReportType)item->GetValueUint32();
-                    }
-                    else
-                    {
-                        current_usages.push_back(HIDUsage(HIDUsageType::GenericDesktop, item->GetValueUint32()));
-                    }
-                }
-                else if (current_usage_page->GetValueUint32() == USAGE_PAGE_VendorDefined)
-                {
-                    current_usages.push_back(HIDUsage(HIDUsageType::VendorDefined, item->GetValueUint32()));
-                }
-                break;
             }
 
-            case HIDItemType::HID_USAGE_MAXIMUM:
-            case HIDItemType::HID_USAGE_MINIMUM:
-            {
-                if (current_usage_page->GetValueUint32() == USAGE_PAGE_Button)
-                {
-                    if (current_usages.size() == 0)
-                        current_usages.push_back(HIDUsage(HIDUsageType::Button));
-                }    
-                
-                for (HIDUsage &usage : current_usages)
-                {
-                    if (item->GetType() == HIDItemType::HID_USAGE_MINIMUM)
-                        usage.usage_min = item->GetValueUint32();
-                    else if (item->GetType() == HIDItemType::HID_USAGE_MAXIMUM)
-                        usage.usage_max = item->GetValueUint32();
-                } 
-                break;
-            }
-            
-            case HIDItemType::HID_REPORT_ID:
-            {
-                current_report_id = item->GetValueUint32();
-                break;
-            }
-
-            case HIDItemType::HID_LOGICAL_MINIMUM:
-            case HIDItemType::HID_LOGICAL_MAXIMUM:
-            case HIDItemType::HID_PHYSICAL_MINIMUM:
-            case HIDItemType::HID_PHYSICAL_MAXIMUM:
-            case HIDItemType::HID_UNIT_EXPONENT:
-            case HIDItemType::HID_UNIT:
-            case HIDItemType::HID_REPORT_SIZE:
-            case HIDItemType::HID_REPORT_COUNT:
-            {
-                if (item->GetType() == HIDItemType::HID_LOGICAL_MINIMUM)
-                    current_property.logical_min = item->GetValueUint32();
-                else if (item->GetType() == HIDItemType::HID_LOGICAL_MAXIMUM)
-                    current_property.logical_max = item->GetValueUint32();
-                else if (item->GetType() == HIDItemType::HID_PHYSICAL_MINIMUM)
-                    current_property.physical_min = item->GetValueUint32();
-                else if (item->GetType() == HIDItemType::HID_PHYSICAL_MAXIMUM)
-                    current_property.physical_max = item->GetValueUint32();
-                else if (item->GetType() == HIDItemType::HID_UNIT_EXPONENT)
-                    current_property.unit_exponent = item->GetValueUint32();
-                else if (item->GetType() == HIDItemType::HID_UNIT)
-                    current_property.unit = item->GetValueUint32();
-                else if (item->GetType() == HIDItemType::HID_REPORT_SIZE)
-                    current_property.size = item->GetValueUint32();
-                else if (item->GetType() == HIDItemType::HID_REPORT_COUNT)
-                    current_property.count = item->GetValueUint32();
-               
-                break;
-            }
-
-            case HIDItemType::HID_INPUT:
-            case HIDItemType::HID_OUTPUT:
-            case HIDItemType::HID_FEATURE:
-            {
-                std::vector<HIDIOBlock> *ioblocks;
-                
-                if (item->GetType() == HIDItemType::HID_INPUT)
-                    ioblocks = &current_report->inputs;
-                else if (item->GetType() == HIDItemType::HID_OUTPUT)
-                    ioblocks = &current_report->outputs;
-                else if (item->GetType() == HIDItemType::HID_FEATURE)
-                    ioblocks = &current_report->features;
-
-                if (ioblocks->size() == 0 || current_report_id != 0)
-                    ioblocks->push_back(HIDIOBlock()); //Create a new block of data because report id changed or no block of data
-
-                if (current_report_id != 0)
-                {
-                    ioblocks->back().data.push_back(HIDInputOutput(HIDIOType::ReportId, 8, current_report_id));
-                    current_report_id = 0;
-                }
-
-                if (current_usages.size() == 0)
-                    current_usages.push_back(HIDUsage(HIDUsageType::Padding));
-
-                for (HIDUsage &usage : current_usages)
-                {
-                    assert((current_property.count == current_usages.size()) || (current_usages.size() == 1));
-                    
-                    uint32_t count = current_property.count / (uint32_t)current_usages.size();
-                    for (uint32_t i = 0; i < count; i++)
-                    {
-                        ioblocks->back().data.push_back(HIDInputOutput(usage, current_property, i));
-                    }
-                }
-                current_usages.clear();
-                break;
-            }
-
-                //For now collections are ignored
-            case HIDItemType::HID_COLLECTION:
-            {
-                current_usages.clear();
-                
-                collection_stack.push(std::make_shared<HIDCollection>((HIDCollectionType)(item->GetValueUint32())));
-                break;
-            }
-
-            case HIDItemType::HID_END_COLLECTION:
-            {
-                collection_stack.pop();
-
-                if (collection_stack.size() == 0)
-                {
-                    m_reports.push_back(current_report);
-                    current_report = nullptr;
-                }
-
-                break;
-            }
+            current_data.clear();
+            current_size = 0;
         }
     }
 
-    assert(current_report == nullptr);
-    assert(collection_stack.size() == 0);    
-}
-
-/* -------------------------------------------------------------------- */
-
-std::vector<std::shared_ptr<HIDItem>> HIDReportDescriptor::parseItems(const uint8_t *hid_report_data, uint16_t hid_report_data_len)
-{
-    std::vector<std::shared_ptr<HIDItem>> items;
-
-    for (uint16_t offset = 0; offset < hid_report_data_len; /* ... */)
-    {
-        uint8_t item_type = hid_report_data[offset];
-        uint8_t datalen = item_type & HID_LENGTH_MASK;
-        if (datalen == 3) datalen = 4;
-
-        std::shared_ptr<HIDItem> item = std::make_shared<HIDItem>((HIDItemType)(item_type & HID_FUNC_TYPE_MASK), &hid_report_data[offset + 1], datalen);
-        offset += 1 + datalen;
-        
-        items.push_back(item);
-    }
-
-    return items;  
+    assert(m_reports.size() > 0);
 }
