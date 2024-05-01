@@ -266,12 +266,6 @@ std::vector<HIDUsage> HIDReportDescriptorUsages::parse(std::vector<HIDElement> e
             case HIDElementType::HID_END_COLLECTION:
             {
                 collection_stack.pop();
-
-                if (collection_stack.size() == 0)
-                {
-                    
-                }
-
                 break;
             }
         }

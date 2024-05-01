@@ -99,19 +99,20 @@ HIDReportDescriptor::~HIDReportDescriptor()
 
 void HIDReportDescriptor::parse(const uint8_t *hid_report_data, uint16_t hid_report_data_len)
 {
-    std::vector<HIDUsage> hid_report_usage = HIDReportDescriptorUsages::parse(HIDReportDescriptorElements::parse(hid_report_data, hid_report_data_len));
+    std::vector<HIDElement> hid_report_elements = HIDReportDescriptorElements::parse(hid_report_data, hid_report_data_len);
+    std::vector<HIDUsage> hid_report_usage = HIDReportDescriptorUsages::parse(hid_report_elements);
 
     std::vector<HIDInputOutput> current_data;
     uint32_t current_size = 0;
 
     for (size_t k = 0; k < hid_report_usage.size(); k++)
     {
-        HIDIOBlock *ioblocks = NULL;
+        std::vector<HIDIOBlock> *ioblocks = NULL;
         HIDUsage &usage = hid_report_usage[k];
 
         if (usage.type == HIDUsageType::GenericDesktop)
         {
-            if (((HIDUsageGenericDesktopSubType)usage.sub_type) < HIDUsageGenericDesktopSubType::InputTypeEnd 
+            if (((HIDUsageGenericDesktopSubType)usage.sub_type) < HIDUsageGenericDesktopSubType::ReportTypeEnd 
                 && ((HIDUsageGenericDesktopSubType)usage.sub_type) != HIDUsageGenericDesktopSubType::Pointer)
             {
                 m_reports.push_back(std::make_shared<HIDReport>((HIDReportType)usage.sub_type));
@@ -147,11 +148,13 @@ void HIDReportDescriptor::parse(const uint8_t *hid_report_data, uint16_t hid_rep
                 ordered_current_data.push_back(current_data[i]);
                 data_len += current_data[i].size;
 
-                //reverse 8 by 8
                 if (data_len >= 8)
                 {
+                    if (current_data[i].type == HIDIOType::ReportId || ioblocks->size() == 0)
+                        ioblocks->push_back(HIDIOBlock());
+
                     std::reverse(ordered_current_data.begin(), ordered_current_data.end());
-                    ioblocks->data.insert(ioblocks->data.end(), ordered_current_data.begin(), ordered_current_data.end());
+                    ioblocks->back().data.insert(ioblocks->back().data.end(), ordered_current_data.begin(), ordered_current_data.end());
                     ordered_current_data.clear();
                     data_len = 0;
                 }

@@ -29,7 +29,7 @@ enum class HIDUsageGenericDesktopSubType
     Keypad = 0x07,
     MultiAxisController = 0x08,
 
-    InputTypeEnd = 0x1F,
+    ReportTypeEnd = 0x1F,
     
     X           = 0x30,
     Y           = 0x31,

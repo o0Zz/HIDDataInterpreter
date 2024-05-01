@@ -61,49 +61,52 @@ bool HIDJoystick::parseData(uint8_t *data, uint16_t datalen, HIDJoystickData *jo
 		if (report->report_type != HIDReportType::Joystick && report->report_type != HIDReportType::GamePad)
 			continue;
 
-		for (auto input: report->inputs.data)
+		for (auto ioblock: report->inputs)
 		{
-			uint32_t value = HIDUtils::readBits(data, bitOffset, input.size);
-			bitOffset += input.size;
+			for (auto input: ioblock.data)
+			{
+				uint32_t value = HIDUtils::readBits(data, bitOffset, input.size);
+				bitOffset += input.size;
 
-			if (input.type == HIDIOType::ReportId)
-			{
-				if (value != input.id)
-					break; //Not the correct report id
-			}
-			else if (input.type == HIDIOType::Button)
-			{
-				if (input.id >= MAX_BUTTONS)
-					return false;
+				if (input.type == HIDIOType::ReportId)
+				{
+					if (value != input.id)
+						break; //Not the correct report id
+				}
+				else if (input.type == HIDIOType::Button)
+				{
+					if (input.id >= MAX_BUTTONS)
+						return false;
 
-				joystick_data->buttons[input.id] = value;
-				if (joystick_data->button_count < input.id)
-					joystick_data->button_count = input.id;
-			}
-			else if (input.type == HIDIOType::X)
-			{
-				if (joystick_data->sticks[joystick_data->stick_count].support & JOYSTICK_SUPPORT_X)
-					joystick_data->stick_count++; //If we already set X it means it's a new stick
+					joystick_data->buttons[input.id] = value;
+					if (joystick_data->button_count < input.id)
+						joystick_data->button_count = input.id;
+				}
+				else if (input.type == HIDIOType::X)
+				{
+					if (joystick_data->sticks[joystick_data->stick_count].support & JOYSTICK_SUPPORT_X)
+						joystick_data->stick_count++; //If we already set X it means it's a new stick
 
-				joystick_data->sticks[joystick_data->stick_count].support |= JOYSTICK_SUPPORT_X;
-				joystick_data->sticks[joystick_data->stick_count].X = value;
-			}
-			else if (input.type == HIDIOType::Y)
-			{
-				if (joystick_data->sticks[joystick_data->stick_count].support & JOYSTICK_SUPPORT_Y)
-					joystick_data->stick_count++; //If we already set Y it means it's a new stick
+					joystick_data->sticks[joystick_data->stick_count].support |= JOYSTICK_SUPPORT_X;
+					joystick_data->sticks[joystick_data->stick_count].X = value;
+				}
+				else if (input.type == HIDIOType::Y)
+				{
+					if (joystick_data->sticks[joystick_data->stick_count].support & JOYSTICK_SUPPORT_Y)
+						joystick_data->stick_count++; //If we already set Y it means it's a new stick
 
-				joystick_data->sticks[joystick_data->stick_count].support |= JOYSTICK_SUPPORT_Y;
-				joystick_data->sticks[joystick_data->stick_count].Y = value;
-			}
-			else if (input.type == HIDIOType::HatSwitch)
-			{
-				joystick_data->has_hat_switch = true;
-				joystick_data->hat_switch = (HIDJoystickHatSwitch)value;
-			}
-			else if (input.type == HIDIOType::Padding || input.type == HIDIOType::Unknown)
-			{
-				//Nothing to do
+					joystick_data->sticks[joystick_data->stick_count].support |= JOYSTICK_SUPPORT_Y;
+					joystick_data->sticks[joystick_data->stick_count].Y = value;
+				}
+				else if (input.type == HIDIOType::HatSwitch)
+				{
+					joystick_data->has_hat_switch = true;
+					joystick_data->hat_switch = (HIDJoystickHatSwitch)value;
+				}
+				else if (input.type == HIDIOType::Padding || input.type == HIDIOType::Unknown)
+				{
+					//Nothing to do
+				}
 			}
 		}
 

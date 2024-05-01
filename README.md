@@ -4,6 +4,56 @@ It allows to parse and access data from a USB device in an abstract manner.
 
 # Supported devices
 [X] Joystick
+[X] Gamepad
+
+# Architecture
+```
+                                                    
+                   ┌─────────────────────────────┐
+      Input        │                             │   Output
+                   │                             │
+──────────────────►│         HIDJoystick         ├─────────────►   HIDJoystickData
+                   │                             │
+Joystick Raw data  │                             │
+                   └─────────────────────────────┘
+                                 ▲                
+                                 │                
+                                 │                
+                   ┌─────────────┴───────────────┐
+                   │                             │
+                   │                             │
+                   │     HIDReportDescriptor     │ Responsible to convert Usages to
+                   │                             │ HIDInputOutput blocks
+                   │                             │
+                   └─────────────────────────────┘
+                                 ▲                
+                                 │                
+                                 │                
+                   ┌─────────────┴───────────────┐
+                   │                             │
+                   │                             │
+                   │  HIDReportDescriptorUsages  │ Responsible to convert Key/Value to
+                   │                             │ Usages with properties
+                   │                             │
+                   └─────────────────────────────┘
+                                 ▲                
+                                 │                
+                                 │                
+                   ┌─────────────┴───────────────┐
+                   │                             │
+                   │                             │
+                   │ HIDReportDescriptorElements │ Responsible to convert report to
+                   │                             │ Key/Value
+                   │                             │
+                   └─────────────────────────────┘
+                                 ▲                
+                                 │                
+                                 │ Input          
+                                 │                
+                      Raw HID Descriptor report 
+				 
+```
+https://asciiflow.com/
 
 # Usage
 

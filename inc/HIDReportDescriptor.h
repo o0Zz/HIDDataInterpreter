@@ -78,9 +78,9 @@ public:
     {}
 
     HIDReportType report_type;
-    HIDIOBlock inputs;
-    HIDIOBlock outputs;
-    HIDIOBlock features;
+    std::vector<HIDIOBlock> inputs;
+    std::vector<HIDIOBlock> outputs;
+    std::vector<HIDIOBlock> features;
 };
 
 /* -------------------------------------------------------------------------- */
@@ -94,7 +94,7 @@ public:
     std::vector<std::shared_ptr<HIDReport>> GetReports() const { return m_reports; }
     
 private:
-    void                                   parse(const uint8_t *hid_report_data, uint16_t hid_report_data_len);
+    void parse(const uint8_t *hid_report_data, uint16_t hid_report_data_len);
 
     std::vector<std::shared_ptr<HIDReport>> m_reports;
 };
