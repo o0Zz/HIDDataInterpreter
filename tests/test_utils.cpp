@@ -1,5 +1,10 @@
 #include <gtest/gtest.h>
-#include "HIDUtils.h"
+
+class HIDUtils
+{
+public:
+	static uint32_t readBits(uint8_t *buffer, uint32_t bitOffset, uint32_t bitLength);
+};
 
 TEST(UTILS, test_read_bits)
 {
