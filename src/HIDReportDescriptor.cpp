@@ -145,7 +145,7 @@ void HIDReportDescriptor::parse(const uint8_t *hid_report_data, uint16_t hid_rep
                         if (current_data[i].type == HIDIOType::ReportId || ioblocks->size() == 0)
                             ioblocks->push_back(HIDIOBlock());
 
-                        std::reverse(ordered_current_data.begin(), ordered_current_data.end());
+                        std::reverse(ordered_current_data.begin(), ordered_current_data.end()); //Data is stored in little endian, so reverse it
                         ioblocks->back().data.insert(ioblocks->back().data.end(), ordered_current_data.begin(), ordered_current_data.end());
                         ordered_current_data.clear();
                         data_len = 0;

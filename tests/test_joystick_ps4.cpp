@@ -303,10 +303,8 @@ TEST(PS4, test_input_parsing_button1)
 		0x00, 0x00, 0x80, 0x00
 		};
 
-	std::shared_ptr<HIDReportDescriptor> hid_report_descriptor = std::make_shared<HIDReportDescriptor>(report_data, (uint16_t)sizeof(report_data));
-
+	HIDJoystick joystick(std::make_shared<HIDReportDescriptor>(report_data, (uint16_t)sizeof(report_data)));
 	HIDJoystickData joystick_data;
-	HIDJoystick joystick(hid_report_descriptor);
 	
 	GTEST_ASSERT_EQ(joystick.parseData(data, sizeof(data), &joystick_data), true);
 
@@ -323,14 +321,12 @@ TEST(PS4, test_input_parsing_left)
 		0x00, 0x00, 0x80, 0x00
 	};
 
-	std::shared_ptr<HIDReportDescriptor> hid_report_descriptor = std::make_shared<HIDReportDescriptor>(report_data, (uint16_t)sizeof(report_data));
-
+	HIDJoystick joystick(std::make_shared<HIDReportDescriptor>(report_data, (uint16_t)sizeof(report_data)));
 	HIDJoystickData joystick_data;
-	HIDJoystick joystick(hid_report_descriptor);
 	
 	GTEST_ASSERT_EQ(joystick.parseData(data, sizeof(data), &joystick_data), true);
 
-	GTEST_ASSERT_EQ(joystick_data.sticks[0].X, 0);
+	GTEST_ASSERT_EQ(joystick_data.X, 0);
 }
 
 TEST(PS4, test_input_parsing_hatswitch_up)
@@ -343,10 +339,8 @@ TEST(PS4, test_input_parsing_hatswitch_up)
 		0x00, 0x00, 0x80, 0x00
 	};
 
-	std::shared_ptr<HIDReportDescriptor> hid_report_descriptor = std::make_shared<HIDReportDescriptor>(report_data, (uint16_t)sizeof(report_data));
-
+	HIDJoystick joystick(std::make_shared<HIDReportDescriptor>(report_data, (uint16_t)sizeof(report_data)));
 	HIDJoystickData joystick_data;
-	HIDJoystick joystick(hid_report_descriptor);
 	
 	GTEST_ASSERT_EQ(joystick.parseData(data, sizeof(data), &joystick_data), true);
 
@@ -363,10 +357,8 @@ TEST(PS4, test_input_parsing_hatswitch_down)
 		0x00, 0x00, 0x80, 0x00
 	};
 
-	std::shared_ptr<HIDReportDescriptor> hid_report_descriptor = std::make_shared<HIDReportDescriptor>(report_data, (uint16_t)sizeof(report_data));
-
+	HIDJoystick joystick(std::make_shared<HIDReportDescriptor>(report_data, (uint16_t)sizeof(report_data)));
 	HIDJoystickData joystick_data;
-	HIDJoystick joystick(hid_report_descriptor);
 	
 	GTEST_ASSERT_EQ(joystick.parseData(data, sizeof(data), &joystick_data), true);
 
@@ -383,10 +375,8 @@ TEST(PS4, test_input_parsing_hatswitch_neutral)
 		0x00, 0x00, 0x80, 0x00
 	};
 
-	std::shared_ptr<HIDReportDescriptor> hid_report_descriptor = std::make_shared<HIDReportDescriptor>(report_data, (uint16_t)sizeof(report_data));
-
+	HIDJoystick joystick(std::make_shared<HIDReportDescriptor>(report_data, (uint16_t)sizeof(report_data)));
 	HIDJoystickData joystick_data;
-	HIDJoystick joystick(hid_report_descriptor);
 	
 	GTEST_ASSERT_EQ(joystick.parseData(data, sizeof(data), &joystick_data), true);
 

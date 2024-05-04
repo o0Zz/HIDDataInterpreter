@@ -7,9 +7,6 @@
 
 #define MAX_BUTTONS 32
 
-#define JOYSTICK_SUPPORT_X 0x01
-#define JOYSTICK_SUPPORT_Y 0x02
-
 enum class HIDJoystickHatSwitch
 {
 	UP = 0,
@@ -23,22 +20,13 @@ enum class HIDJoystickHatSwitch
 	NEUTRAL = 8
 };
 
-class HIDJoystickStick
-{
-public:
-	HIDJoystickStick() :
-		X(0),
-		Y(0),
-		pressed(false)
-	{
-	}
-	~HIDJoystickStick() {}
-	
-	uint8_t X;
-	uint8_t Y;
-	bool pressed;
-	uint8_t support;
-};
+#define JOYSTICK_SUPPORT_X 			0x01
+#define JOYSTICK_SUPPORT_Y 			0x02
+#define JOYSTICK_SUPPORT_Z 			0x04
+#define JOYSTICK_SUPPORT_Rx 		0x08
+#define JOYSTICK_SUPPORT_Ry 		0x10
+#define JOYSTICK_SUPPORT_Rz 		0x20
+#define JOYSTICK_SUPPORT_HatSwitch 	0x40
 
 class HIDJoystickData
 {
@@ -48,14 +36,18 @@ public:
 
 	uint8_t index;
 
+	uint8_t support;
+
+	uint8_t X;
+	uint8_t Y;
+	uint8_t Z;
+	uint8_t Rx;
+	uint8_t Ry;
+	uint8_t Rz;
+	HIDJoystickHatSwitch hat_switch;
+
 	uint8_t button_count;
 	uint8_t buttons[MAX_BUTTONS];
-	
-	uint8_t stick_count;
-	HIDJoystickStick sticks[8];
-
-	bool has_hat_switch;
-	HIDJoystickHatSwitch hat_switch;
 };
 
 class HIDJoystick

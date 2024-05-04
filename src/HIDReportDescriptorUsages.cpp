@@ -54,12 +54,12 @@
 
 /* -------------------------------------------------------------------------- */
 
-HIDUsage::HIDUsage(HIDUsageType type, uint32_t sub_type, HIDProperty property) : 
+HIDUsage::HIDUsage(HIDUsageType type, uint32_t sub_type, HIDUsageIOType io_type, HIDProperty property) : 
     type(type), 
     sub_type(sub_type),
     usage_min(0), 
     usage_max(0),
-    io_type(HIDUsageIOType::None),
+    io_type(io_type),
     property(property)
 {
     if (sub_type != 0)
@@ -129,7 +129,7 @@ std::vector<HIDReport> HIDReportDescriptorUsages::parse(std::vector<HIDElement> 
     std::vector<HIDUsage> current_usages;
     HIDElement *current_usage_page = nullptr;
     std::vector<HIDReport> report;
-    uint32_t current_report_id = 0;
+    uint8_t current_report_id = 0;
 
     for (HIDElement &element : elements)
     {
@@ -219,9 +219,7 @@ std::vector<HIDReport> HIDReportDescriptorUsages::parse(std::vector<HIDElement> 
 
                 if (current_report_id != 0)
                 {
-                    HIDUsage report_id_usage(HIDUsageType::ReportId, current_report_id, HIDProperty(8, 1));
-                    report_id_usage.io_type = io_type;
-                    current_usages.insert(current_usages.begin(), report_id_usage);
+                    current_usages.insert(current_usages.begin(), HIDUsage(HIDUsageType::ReportId, current_report_id, io_type, HIDProperty(8, 1)));
                     current_report_id = 0;
                 }
 

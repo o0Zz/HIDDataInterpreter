@@ -66,7 +66,7 @@ public:
     /// @param type 
     /// @param sub_type will depend on the type, for example, if type is GenericDesktop, sub_type will be HIDUsageGenericDesktopSubType etc.
     /// @param property 
-    HIDUsage(HIDUsageType type, uint32_t sub_type = 0, HIDProperty property = HIDProperty());
+    HIDUsage(HIDUsageType type, uint32_t sub_type = 0, HIDUsageIOType io_type = HIDUsageIOType::None, HIDProperty property = HIDProperty());
     ~HIDUsage();
 
     HIDUsageType type; //Input type (Button, X, Y, Hat switch, Padding, etc.)
