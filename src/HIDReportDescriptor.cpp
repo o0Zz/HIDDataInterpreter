@@ -100,68 +100,61 @@ HIDReportDescriptor::~HIDReportDescriptor()
 void HIDReportDescriptor::parse(const uint8_t *hid_report_data, uint16_t hid_report_data_len)
 {
     std::vector<HIDElement> hid_report_elements = HIDReportDescriptorElements::parse(hid_report_data, hid_report_data_len);
-    std::vector<HIDUsage> hid_report_usage = HIDReportDescriptorUsages::parse(hid_report_elements);
+    std::vector<HIDReport> hid_report_usage = HIDReportDescriptorUsages::parse(hid_report_elements);
 
     std::vector<HIDInputOutput> current_data;
     uint32_t current_size = 0;
 
-    for (size_t k = 0; k < hid_report_usage.size(); k++)
+    for (auto report: hid_report_usage)
     {
-        std::vector<HIDIOBlock> *ioblocks = NULL;
-        HIDUsage &usage = hid_report_usage[k];
+        m_reports.push_back(std::make_shared<HIDIOReport>((HIDIOReportType)report.usages[0].sub_type));
 
-        if (usage.type == HIDUsageType::GenericDesktop)
+        for (size_t k = 1; k < report.usages.size(); k++)
         {
-            if (((HIDUsageGenericDesktopSubType)usage.sub_type) < HIDUsageGenericDesktopSubType::ReportTypeEnd 
-                && ((HIDUsageGenericDesktopSubType)usage.sub_type) != HIDUsageGenericDesktopSubType::Pointer)
+            std::vector<HIDIOBlock> *ioblocks = NULL;
+            HIDUsage &usage = report.usages[k];
+
+            if (usage.io_type == HIDUsageIOType::Input)
+                ioblocks = &m_reports.back()->inputs;
+            else if (usage.io_type == HIDUsageIOType::Output)
+                ioblocks = &m_reports.back()->outputs;
+            else if (usage.io_type == HIDUsageIOType::Feature)
+                ioblocks = &m_reports.back()->features;
+            else
+                continue;
+
+            for (uint32_t i = 0; i < usage.property.count; i++)
             {
-                m_reports.push_back(std::make_shared<HIDReport>((HIDReportType)usage.sub_type));
+                current_data.push_back(HIDInputOutput(usage, i));
+                current_size += usage.property.size;
             }
-        }
 
-        if (m_reports.size() == 0)
-            continue;
-
-        if (usage.io_type == HIDUsageIOType::Input)
-            ioblocks = &m_reports.back()->inputs;
-        else if (usage.io_type == HIDUsageIOType::Output)
-            ioblocks = &m_reports.back()->outputs;
-        else if (usage.io_type == HIDUsageIOType::Feature)
-            ioblocks = &m_reports.back()->features;
-        else
-            continue;
-
-        for (uint32_t i = 0; i < usage.property.count; i++)
-        {
-            current_data.push_back(HIDInputOutput(usage, i));
-            current_size += usage.property.size;
-        }
-
-            //If we read enough data to have a complete byte, we can reorder them and add it to the data
-        if (current_size%8 == 0)
-        {
-            std::vector<HIDInputOutput> ordered_current_data;
-
-            uint32_t data_len = 0;
-            for (size_t i = 0; i < current_data.size(); i++)
+                //If we read enough data to have a complete byte, we can reorder them and add it to the data
+            if (current_size%8 == 0)
             {
-                ordered_current_data.push_back(current_data[i]);
-                data_len += current_data[i].size;
+                std::vector<HIDInputOutput> ordered_current_data;
 
-                if (data_len >= 8)
+                uint32_t data_len = 0;
+                for (size_t i = 0; i < current_data.size(); i++)
                 {
-                    if (current_data[i].type == HIDIOType::ReportId || ioblocks->size() == 0)
-                        ioblocks->push_back(HIDIOBlock());
+                    ordered_current_data.push_back(current_data[i]);
+                    data_len += current_data[i].size;
 
-                    std::reverse(ordered_current_data.begin(), ordered_current_data.end());
-                    ioblocks->back().data.insert(ioblocks->back().data.end(), ordered_current_data.begin(), ordered_current_data.end());
-                    ordered_current_data.clear();
-                    data_len = 0;
+                    if (data_len >= 8)
+                    {
+                        if (current_data[i].type == HIDIOType::ReportId || ioblocks->size() == 0)
+                            ioblocks->push_back(HIDIOBlock());
+
+                        std::reverse(ordered_current_data.begin(), ordered_current_data.end());
+                        ioblocks->back().data.insert(ioblocks->back().data.end(), ordered_current_data.begin(), ordered_current_data.end());
+                        ordered_current_data.clear();
+                        data_len = 0;
+                    }
                 }
-            }
 
-            current_data.clear();
-            current_size = 0;
+                current_data.clear();
+                current_size = 0;
+            }
         }
     }
 

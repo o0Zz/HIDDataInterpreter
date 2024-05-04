@@ -77,8 +77,14 @@ public:
     HIDProperty property;
 };
 
+class HIDReport
+{
+public:
+    std::vector<HIDUsage> usages;
+};
+
 class HIDReportDescriptorUsages
 {
 public:
-    static std::vector<HIDUsage> parse(std::vector<HIDElement> elements);
+    static std::vector<HIDReport> parse(std::vector<HIDElement> elements);
 };

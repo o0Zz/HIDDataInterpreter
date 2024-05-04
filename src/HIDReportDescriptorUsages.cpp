@@ -7,7 +7,6 @@
 #include <algorithm>
 
 //---------------USAGE_PAGE-----------------
-
 #define USAGE_PAGE_GenericDesktop       0x01
 #define USAGE_PAGE_Simulation           0x02
 #define USAGE_PAGE_VR                   0x03
@@ -23,7 +22,6 @@
 #define USAGE_PAGE_VendorDefined        0xFF00
 
 //---------------USAGE-----------------
-
 #define USAGE_X             0x30
 #define USAGE_Y             0x31
 #define USAGE_Z             0x32
@@ -45,32 +43,14 @@
 #define INPUT_Null          0x40
 #define INPUT_Vol           0x80
 
-/* -------------------------------------------------------------------- */
-
-typedef enum class HIDCollectionType
-{
-    HID_COLLECTION_PHYSICAL = 0x00,
-    HID_COLLECTION_APPLICATION = 0x01,
-    HID_COLLECTION_LOGICAL = 0x02,
-    HID_COLLECTION_REPORT = 0x03,
-    HID_COLLECTION_NAMED_ARRAY = 0x04,
-    HID_COLLECTION_USAGE_SWITCH = 0x05,
-    HID_COLLECTION_USAGE_MODIFIER = 0x06
-} HIDCollectionType;
-
-/* -------------------------------------------------------------------------- */
-
-class HIDCollection
-{
-public:
-    HIDCollection(HIDCollectionType type) :
-        m_type(type)
-    {
-    }
-    ~HIDCollection() {}
-
-    HIDCollectionType m_type;
-};
+//---------------COLLECTION-----------------
+#define HID_COLLECTION_PHYSICAL 0x00
+#define HID_COLLECTION_APPLICATION 0x01
+#define HID_COLLECTION_LOGICAL 0x02
+#define HID_COLLECTION_REPORT 0x03
+#define HID_COLLECTION_NAMED_ARRAY 0x04
+#define HID_COLLECTION_USAGE_SWITCH 0x05
+#define HID_COLLECTION_USAGE_MODIFIER 0x06
 
 /* -------------------------------------------------------------------------- */
 
@@ -143,29 +123,25 @@ HIDUsageType convert_usage_page(uint32_t usage_page)
 
 /* -------------------------------------------------------------------------- */
 
-std::vector<HIDUsage> HIDReportDescriptorUsages::parse(std::vector<HIDElement> elements)
+std::vector<HIDReport> HIDReportDescriptorUsages::parse(std::vector<HIDElement> elements)
 {
     HIDProperty current_property;
     std::vector<HIDUsage> current_usages;
     HIDElement *current_usage_page = nullptr;
-    std::stack<std::shared_ptr<HIDCollection>> collection_stack;
-    std::vector<HIDUsage> usages;
+    std::vector<HIDReport> report;
+    uint32_t current_report_id = 0;
 
     for (HIDElement &element : elements)
     {
         switch (element.GetType())
         {
             case HIDElementType::HID_USAGE_PAGE:
-            {
                 current_usage_page = &element;
                 break;
-            }
             
             case HIDElementType::HID_USAGE:
-            {
                 current_usages.push_back(HIDUsage(convert_usage_page(current_usage_page->GetValueUint32()), element.GetValueUint32()));
                 break;
-            }
 
             case HIDElementType::HID_USAGE_MAXIMUM:
             case HIDElementType::HID_USAGE_MINIMUM:
@@ -184,39 +160,40 @@ std::vector<HIDUsage> HIDReportDescriptorUsages::parse(std::vector<HIDElement> e
             }
             
             case HIDElementType::HID_REPORT_ID:
-            {
-                current_usages.push_back(HIDUsage(HIDUsageType::ReportId, element.GetValueUint32(), HIDProperty(8, 1)));
+                current_report_id = element.GetValueUint32();
                 break;
-            }
 
             case HIDElementType::HID_LOGICAL_MINIMUM:
-            case HIDElementType::HID_LOGICAL_MAXIMUM:
-            case HIDElementType::HID_PHYSICAL_MINIMUM:
-            case HIDElementType::HID_PHYSICAL_MAXIMUM:
-            case HIDElementType::HID_UNIT_EXPONENT:
-            case HIDElementType::HID_UNIT:
-            case HIDElementType::HID_REPORT_SIZE:
-            case HIDElementType::HID_REPORT_COUNT:
-            {
-                if (element.GetType() == HIDElementType::HID_LOGICAL_MINIMUM)
-                    current_property.logical_min = element.GetValueUint32();
-                else if (element.GetType() == HIDElementType::HID_LOGICAL_MAXIMUM)
-                    current_property.logical_max = element.GetValueUint32();
-                else if (element.GetType() == HIDElementType::HID_PHYSICAL_MINIMUM)
-                    current_property.physical_min = element.GetValueUint32();
-                else if (element.GetType() == HIDElementType::HID_PHYSICAL_MAXIMUM)
-                    current_property.physical_max = element.GetValueUint32();
-                else if (element.GetType() == HIDElementType::HID_UNIT_EXPONENT)
-                    current_property.unit_exponent = element.GetValueUint32();
-                else if (element.GetType() == HIDElementType::HID_UNIT)
-                    current_property.unit = element.GetValueUint32();
-                else if (element.GetType() == HIDElementType::HID_REPORT_SIZE)
-                    current_property.size = element.GetValueUint32();
-                else if (element.GetType() == HIDElementType::HID_REPORT_COUNT)
-                    current_property.count = element.GetValueUint32();
-               
+                current_property.logical_min = element.GetValueUint32();
                 break;
-            }
+
+            case HIDElementType::HID_LOGICAL_MAXIMUM:
+                current_property.logical_max = element.GetValueUint32();
+                break;
+
+            case HIDElementType::HID_PHYSICAL_MINIMUM:
+                current_property.physical_min = element.GetValueUint32();
+                break;
+
+            case HIDElementType::HID_PHYSICAL_MAXIMUM:
+                current_property.physical_max = element.GetValueUint32();
+                break;
+
+            case HIDElementType::HID_UNIT_EXPONENT:
+                current_property.unit_exponent = element.GetValueUint32();
+                break;
+
+            case HIDElementType::HID_UNIT:
+                current_property.unit = element.GetValueUint32();
+                break;
+
+            case HIDElementType::HID_REPORT_SIZE:
+                current_property.size = element.GetValueUint32();
+                break;
+                
+            case HIDElementType::HID_REPORT_COUNT:
+                current_property.count = element.GetValueUint32();
+                break;
 
             case HIDElementType::HID_INPUT:
             case HIDElementType::HID_OUTPUT:
@@ -224,31 +201,31 @@ std::vector<HIDUsage> HIDReportDescriptorUsages::parse(std::vector<HIDElement> e
             {
                 if (current_usages.size() == 0)
                     current_usages.push_back(HIDUsage(HIDUsageType::Padding));
+                current_property.count /= current_usages.size();
 
-                //Update count according to current_usages count
-                uint8_t usage_count = 0;
+                HIDUsageIOType io_type = HIDUsageIOType::None;
+                if (element.GetType() == HIDElementType::HID_INPUT)
+                    io_type = HIDUsageIOType::Input;
+                else if (element.GetType() == HIDElementType::HID_OUTPUT)
+                    io_type = HIDUsageIOType::Output;
+                else if (element.GetType() == HIDElementType::HID_FEATURE)
+                    io_type = HIDUsageIOType::Feature;
+
                 for (HIDUsage &usage : current_usages)
                 {
-                    if (!usage.property.is_valid())
-                        usage_count++;
+                    usage.io_type = io_type;
+                    usage.property = current_property;
                 }
 
-                current_property.count /= usage_count;
-
-                for (HIDUsage &usage : current_usages)
+                if (current_report_id != 0)
                 {
-                    if (element.GetType() == HIDElementType::HID_INPUT)
-                        usage.io_type = HIDUsageIOType::Input;
-                    else if (element.GetType() == HIDElementType::HID_OUTPUT)
-                        usage.io_type = HIDUsageIOType::Output;
-                    else if (element.GetType() == HIDElementType::HID_FEATURE)
-                        usage.io_type = HIDUsageIOType::Feature;
-
-                    if (!usage.property.is_valid())
-                        usage.property = current_property;
+                    HIDUsage report_id_usage(HIDUsageType::ReportId, current_report_id, HIDProperty(8, 1));
+                    report_id_usage.io_type = io_type;
+                    current_usages.insert(current_usages.begin(), report_id_usage);
+                    current_report_id = 0;
                 }
 
-                usages.insert(usages.end(), current_usages.begin(), current_usages.end());
+                report.back().usages.insert(report.back().usages.end(), current_usages.begin(), current_usages.end());
                 current_usages.clear();
                 break;
             }
@@ -256,22 +233,20 @@ std::vector<HIDUsage> HIDReportDescriptorUsages::parse(std::vector<HIDElement> e
                 //For now collections are ignored
             case HIDElementType::HID_COLLECTION:
             {
-                usages.insert(usages.end(), current_usages.begin(), current_usages.end());
+                if (element.GetValueUint32() == HID_COLLECTION_APPLICATION)
+                    report.push_back(HIDReport());
+
+                report.back().usages.insert(report.back().usages.end(), current_usages.begin(), current_usages.end());
                 current_usages.clear();
-                
-                collection_stack.push(std::make_shared<HIDCollection>((HIDCollectionType)(element.GetValueUint32())));
                 break;
             }
 
             case HIDElementType::HID_END_COLLECTION:
             {
-                collection_stack.pop();
                 break;
             }
         }
     }
 
-    assert(collection_stack.size() == 0);    
-
-    return usages;
+    return report;
 }

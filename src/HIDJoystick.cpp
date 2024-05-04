@@ -40,8 +40,8 @@ uint8_t HIDJoystick::getCount()
 
 	for (auto report: descriptor->GetReports())
 	{
-		if (report->report_type == HIDReportType::Joystick
-			|| report->report_type == HIDReportType::GamePad)
+		if (report->report_type == HIDIOReportType::Joystick
+			|| report->report_type == HIDIOReportType::GamePad)
 			count++;
 	}
 
@@ -52,13 +52,14 @@ uint8_t HIDJoystick::getCount()
 
 bool HIDJoystick::parseData(uint8_t *data, uint16_t datalen, HIDJoystickData *joystick_data) 
 {
+	bool found = false;
 	uint32_t bitOffset = 0;
 
 	memset(joystick_data, 0, sizeof(HIDJoystickData));
 
 	for (auto report: descriptor->GetReports())
 	{
-		if (report->report_type != HIDReportType::Joystick && report->report_type != HIDReportType::GamePad)
+		if (report->report_type != HIDIOReportType::Joystick && report->report_type != HIDIOReportType::GamePad)
 			continue;
 
 		for (auto ioblock: report->inputs)
@@ -73,7 +74,10 @@ bool HIDJoystick::parseData(uint8_t *data, uint16_t datalen, HIDJoystickData *jo
 					if (value != input.id)
 						break; //Not the correct report id
 				}
-				else if (input.type == HIDIOType::Button)
+				
+				found = true;
+
+				if (input.type == HIDIOType::Button)
 				{
 					if (input.id >= MAX_BUTTONS)
 						return false;
@@ -108,10 +112,11 @@ bool HIDJoystick::parseData(uint8_t *data, uint16_t datalen, HIDJoystickData *jo
 					//Nothing to do
 				}
 			}
+
+			if (found)
+				return true;
 		}
-
-		return true;
-
 	}
+
 	return false;
 }

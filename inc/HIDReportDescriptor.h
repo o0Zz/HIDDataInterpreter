@@ -46,7 +46,7 @@ public:
 /* -------------------------------------------------------------------------- */
 
 //https://usb.org/sites/default/files/hut1_2.pdf p31
-typedef enum class HIDReportType
+typedef enum class HIDIOReportType
 {
     Unknown = 0x00,
     Pointer = 0x01,
@@ -59,7 +59,7 @@ typedef enum class HIDReportType
     Tablet = 0x09,
 
     MAX = 0x2F
-} HIDReportType;
+} HIDIOReportType;
 
 class HIDIOBlock
 {
@@ -70,14 +70,14 @@ public:
     std::vector<HIDInputOutput> data;
 };
 
-class HIDReport
+class HIDIOReport
 {
 public:
-    HIDReport(HIDReportType report_type = HIDReportType::Unknown) :
+    HIDIOReport(HIDIOReportType report_type = HIDIOReportType::Unknown) :
         report_type(report_type)
     {}
 
-    HIDReportType report_type;
+    HIDIOReportType report_type;
     std::vector<HIDIOBlock> inputs;
     std::vector<HIDIOBlock> outputs;
     std::vector<HIDIOBlock> features;
@@ -91,10 +91,10 @@ public:
     HIDReportDescriptor(const uint8_t *hid_report_data, uint16_t hid_report_data_size);
     ~HIDReportDescriptor();
 
-    std::vector<std::shared_ptr<HIDReport>> GetReports() const { return m_reports; }
+    std::vector<std::shared_ptr<HIDIOReport>> GetReports() const { return m_reports; }
     
 private:
     void parse(const uint8_t *hid_report_data, uint16_t hid_report_data_len);
 
-    std::vector<std::shared_ptr<HIDReport>> m_reports;
+    std::vector<std::shared_ptr<HIDIOReport>> m_reports;
 };

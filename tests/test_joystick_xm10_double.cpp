@@ -91,8 +91,8 @@ TEST(HID, test_report_has_2_joystick)
 {
 	std::shared_ptr<HIDReportDescriptor> hid_report_descriptor = std::make_shared<HIDReportDescriptor>(report_data, (uint16_t)sizeof(report_data));
 	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports().size(), 2);
-	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->report_type, HIDReportType::Joystick);
-	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[1]->report_type, HIDReportType::Joystick);
+	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->report_type, HIDIOReportType::Joystick);
+	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[1]->report_type, HIDIOReportType::Joystick);
 }
 
 TEST(HID, test_report_ids_for_joysticks)
