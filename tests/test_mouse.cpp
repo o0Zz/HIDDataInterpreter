@@ -52,19 +52,19 @@ const uint8_t report_data[] = {
 
 TEST(MOUSE, test_report_has_1_mouse)
 {
-	std::shared_ptr<HIDReportDescriptor> hid_report_descriptor = std::make_shared<HIDReportDescriptor>(report_data, (uint16_t)sizeof(report_data));
-	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports().size(), 1);
-	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->report_type, HIDIOReportType::Mouse);
+	HIDReportDescriptor hid_report_descriptor(report_data, (uint16_t)sizeof(report_data));
+	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports().size(), 1);
+	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].report_type, HIDIOReportType::Mouse);
 }
 
 TEST(MOUSE, test_report_correct_inputs)
 {
-	std::shared_ptr<HIDReportDescriptor> hid_report_descriptor = std::make_shared<HIDReportDescriptor>(report_data, (uint16_t)sizeof(report_data));
-	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs[0].data.size(), 13);
-	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs[0].data[0].type, HIDIOType::Padding);
-	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs[0].data[7].type, HIDIOType::Button);
-	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs[0].data[8].type, HIDIOType::VendorDefined);
-	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs[0].data[10].type, HIDIOType::Wheel);
-	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs[0].data[11].type, HIDIOType::X);
-	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs[0].data[12].type, HIDIOType::Y);
+	HIDReportDescriptor hid_report_descriptor(report_data, (uint16_t)sizeof(report_data));
+	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].inputs[0].data.size(), 13);
+	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].inputs[0].data[0].type, HIDIOType::Padding);
+	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].inputs[0].data[7].type, HIDIOType::Button);
+	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].inputs[0].data[8].type, HIDIOType::VendorDefined);
+	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].inputs[0].data[10].type, HIDIOType::Wheel);
+	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].inputs[0].data[11].type, HIDIOType::X);
+	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].inputs[0].data[12].type, HIDIOType::Y);
 }

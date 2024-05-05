@@ -86,5 +86,5 @@ public:
 class HIDReportDescriptorUsages
 {
 public:
-    static std::vector<HIDReport> parse(std::vector<HIDElement> elements);
+    static std::vector<HIDReport> parse(const std::vector<HIDElement> &elements);
 };

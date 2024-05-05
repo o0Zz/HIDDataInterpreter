@@ -1,9 +1,7 @@
 #pragma once
 
 #include <stdint.h>
-#include <memory>
 #include <vector>
-#include <string>
 
 enum class HIDIOType 
 {
@@ -88,13 +86,14 @@ public:
 class HIDReportDescriptor
 {
 public:
+    HIDReportDescriptor();
     HIDReportDescriptor(const uint8_t *hid_report_data, uint16_t hid_report_data_size);
     ~HIDReportDescriptor();
 
-    std::vector<std::shared_ptr<HIDIOReport>> GetReports() const { return m_reports; }
+    std::vector<HIDIOReport> GetReports() const { return m_reports; }
     
 private:
     void parse(const uint8_t *hid_report_data, uint16_t hid_report_data_len);
 
-    std::vector<std::shared_ptr<HIDIOReport>> m_reports;
+    std::vector<HIDIOReport> m_reports;
 };

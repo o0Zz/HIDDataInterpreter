@@ -1,8 +1,3 @@
-
-#include <stdint.h>
-#include <memory>
-#include <vector>
-#include <string>
 #include "HIDReportDescriptor.h"
 
 #define MAX_BUTTONS 32
@@ -38,12 +33,12 @@ public:
 
 	uint8_t support;
 
-	uint8_t X;
-	uint8_t Y;
-	uint8_t Z;
-	uint8_t Rx;
-	uint8_t Ry;
-	uint8_t Rz;
+	uint16_t X;
+	uint16_t Y;
+	uint16_t Z;
+	uint16_t Rx;
+	uint16_t Ry;
+	uint16_t Rz;
 	HIDJoystickHatSwitch hat_switch;
 
 	uint8_t button_count;
@@ -53,7 +48,7 @@ public:
 class HIDJoystick
 {
 public:
-	HIDJoystick(std::shared_ptr<HIDReportDescriptor> descriptor);
+	HIDJoystick(const HIDReportDescriptor &descriptor);
 	~HIDJoystick();
 
 	uint8_t getCount();
@@ -61,5 +56,6 @@ public:
 	bool parseData(uint8_t *data, uint16_t datalen, HIDJoystickData *joystick_data);
 
 private:
-	std::shared_ptr<HIDReportDescriptor> descriptor;
+	HIDReportDescriptor 	 m_descriptor;
+	std::vector<HIDIOReport> m_reports;
 };

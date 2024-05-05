@@ -123,15 +123,15 @@ HIDUsageType convert_usage_page(uint32_t usage_page)
 
 /* -------------------------------------------------------------------------- */
 
-std::vector<HIDReport> HIDReportDescriptorUsages::parse(std::vector<HIDElement> elements)
+std::vector<HIDReport> HIDReportDescriptorUsages::parse(const std::vector<HIDElement> &elements)
 {
     HIDProperty current_property;
     std::vector<HIDUsage> current_usages;
-    HIDElement *current_usage_page = nullptr;
+    const HIDElement *current_usage_page = nullptr;
     std::vector<HIDReport> report;
     uint8_t current_report_id = 0;
 
-    for (HIDElement &element : elements)
+    for (const HIDElement &element : elements)
     {
         switch (element.GetType())
         {
@@ -201,7 +201,7 @@ std::vector<HIDReport> HIDReportDescriptorUsages::parse(std::vector<HIDElement> 
             {
                 if (current_usages.size() == 0)
                     current_usages.push_back(HIDUsage(HIDUsageType::Padding));
-                current_property.count /= current_usages.size();
+                current_property.count /= (uint32_t)current_usages.size();
 
                 HIDUsageIOType io_type = HIDUsageIOType::None;
                 if (element.GetType() == HIDElementType::HID_INPUT)

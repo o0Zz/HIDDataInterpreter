@@ -32,14 +32,14 @@ HIDElement::HIDElement(HIDElementType type, const uint8_t *data, uint8_t data_si
 
 /* -------------------------------------------------------------------------- */
 
-HIDElementType HIDElement::GetType()
+HIDElementType HIDElement::GetType() const
 {
     return type;
 }
 
 /* -------------------------------------------------------------------------- */
 
-uint32_t HIDElement::GetValueUint32()
+uint32_t HIDElement::GetValueUint32() const
 {
     return data[0] | ((uint32_t)data[1] << 8) | ((uint32_t)data[2] << 16) | ((uint32_t)data[3] << 24);
 }

@@ -258,39 +258,39 @@ const uint8_t report_data[] = {
 
 TEST(PS4, test_report_has_1_gamepad)
 {
-	std::shared_ptr<HIDReportDescriptor> hid_report_descriptor = std::make_shared<HIDReportDescriptor>(report_data, (uint16_t)sizeof(report_data));
-	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports().size(), 1);
-	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->report_type, HIDIOReportType::GamePad);
+	HIDReportDescriptor hid_report_descriptor(report_data, (uint16_t)sizeof(report_data));
+	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports().size(), 1);
+	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].report_type, HIDIOReportType::GamePad);
 }
 
 TEST(PS4, test_report_correct_inputs)
 {
-	std::shared_ptr<HIDReportDescriptor> hid_report_descriptor = std::make_shared<HIDReportDescriptor>(report_data, (uint16_t)sizeof(report_data));
-	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs[0].data.size(), 77);
-	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs[0].data[0].type, HIDIOType::ReportId);
-	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs[0].data[1].type, HIDIOType::X);
-	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs[0].data[2].type, HIDIOType::Y);
-	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs[0].data[3].type, HIDIOType::Z);
-	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs[0].data[4].type, HIDIOType::Rz);
-	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs[0].data[5].type, HIDIOType::Button);
-	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs[0].data[6].type, HIDIOType::Button);
-	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs[0].data[7].type, HIDIOType::Button);
-	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs[0].data[8].type, HIDIOType::Button);
-	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs[0].data[9].type, HIDIOType::HatSwitch);
+	HIDReportDescriptor hid_report_descriptor(report_data, (uint16_t)sizeof(report_data));
+	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].inputs[0].data.size(), 77);
+	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].inputs[0].data[0].type, HIDIOType::ReportId);
+	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].inputs[0].data[1].type, HIDIOType::X);
+	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].inputs[0].data[2].type, HIDIOType::Y);
+	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].inputs[0].data[3].type, HIDIOType::Z);
+	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].inputs[0].data[4].type, HIDIOType::Rz);
+	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].inputs[0].data[5].type, HIDIOType::Button);
+	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].inputs[0].data[6].type, HIDIOType::Button);
+	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].inputs[0].data[7].type, HIDIOType::Button);
+	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].inputs[0].data[8].type, HIDIOType::Button);
+	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].inputs[0].data[9].type, HIDIOType::HatSwitch);
 	// Buttons are ignored
-	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs[0].data[18].type, HIDIOType::VendorDefined);
-	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs[0].data[19].type, HIDIOType::Button);
-	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs[0].data[20].type, HIDIOType::Button);
-	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs[0].data[21].type, HIDIOType::Rx);
-	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs[0].data[22].type, HIDIOType::Ry);
-	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->inputs[0].data[23].type, HIDIOType::VendorDefined);
+	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].inputs[0].data[18].type, HIDIOType::VendorDefined);
+	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].inputs[0].data[19].type, HIDIOType::Button);
+	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].inputs[0].data[20].type, HIDIOType::Button);
+	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].inputs[0].data[21].type, HIDIOType::Rx);
+	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].inputs[0].data[22].type, HIDIOType::Ry);
+	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].inputs[0].data[23].type, HIDIOType::VendorDefined);
 	// Padding is ignored
 }
 
 TEST(PS4, test_report_correct_features)
 {
-	std::shared_ptr<HIDReportDescriptor> hid_report_descriptor = std::make_shared<HIDReportDescriptor>(report_data, (uint16_t)sizeof(report_data));
-	GTEST_ASSERT_EQ(hid_report_descriptor->GetReports()[0]->features.size(), 48);
+	HIDReportDescriptor hid_report_descriptor(report_data, (uint16_t)sizeof(report_data));
+	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].features.size(), 48);
 }
 
 TEST(PS4, test_input_parsing_button1)
@@ -303,7 +303,7 @@ TEST(PS4, test_input_parsing_button1)
 		0x00, 0x00, 0x80, 0x00
 		};
 
-	HIDJoystick joystick(std::make_shared<HIDReportDescriptor>(report_data, (uint16_t)sizeof(report_data)));
+	HIDJoystick joystick(HIDReportDescriptor(report_data, (uint16_t)sizeof(report_data)));
 	HIDJoystickData joystick_data;
 	
 	GTEST_ASSERT_EQ(joystick.parseData(data, sizeof(data), &joystick_data), true);
@@ -321,7 +321,7 @@ TEST(PS4, test_input_parsing_left)
 		0x00, 0x00, 0x80, 0x00
 	};
 
-	HIDJoystick joystick(std::make_shared<HIDReportDescriptor>(report_data, (uint16_t)sizeof(report_data)));
+	HIDJoystick joystick(HIDReportDescriptor(report_data, (uint16_t)sizeof(report_data)));
 	HIDJoystickData joystick_data;
 	
 	GTEST_ASSERT_EQ(joystick.parseData(data, sizeof(data), &joystick_data), true);
@@ -339,7 +339,7 @@ TEST(PS4, test_input_parsing_hatswitch_up)
 		0x00, 0x00, 0x80, 0x00
 	};
 
-	HIDJoystick joystick(std::make_shared<HIDReportDescriptor>(report_data, (uint16_t)sizeof(report_data)));
+	HIDJoystick joystick(HIDReportDescriptor(report_data, (uint16_t)sizeof(report_data)));
 	HIDJoystickData joystick_data;
 	
 	GTEST_ASSERT_EQ(joystick.parseData(data, sizeof(data), &joystick_data), true);
@@ -357,7 +357,7 @@ TEST(PS4, test_input_parsing_hatswitch_down)
 		0x00, 0x00, 0x80, 0x00
 	};
 
-	HIDJoystick joystick(std::make_shared<HIDReportDescriptor>(report_data, (uint16_t)sizeof(report_data)));
+	HIDJoystick joystick(HIDReportDescriptor(report_data, (uint16_t)sizeof(report_data)));
 	HIDJoystickData joystick_data;
 	
 	GTEST_ASSERT_EQ(joystick.parseData(data, sizeof(data), &joystick_data), true);
@@ -375,7 +375,7 @@ TEST(PS4, test_input_parsing_hatswitch_neutral)
 		0x00, 0x00, 0x80, 0x00
 	};
 
-	HIDJoystick joystick(std::make_shared<HIDReportDescriptor>(report_data, (uint16_t)sizeof(report_data)));
+	HIDJoystick joystick(HIDReportDescriptor(report_data, (uint16_t)sizeof(report_data)));
 	HIDJoystickData joystick_data;
 	
 	GTEST_ASSERT_EQ(joystick.parseData(data, sizeof(data), &joystick_data), true);

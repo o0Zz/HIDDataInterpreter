@@ -83,6 +83,12 @@ HIDInputOutput::HIDInputOutput(const HIDUsage &usage, uint32_t idx) :
 
 /* -------------------------------------------------------------------- */
 
+HIDReportDescriptor::HIDReportDescriptor()
+{
+}
+
+/* -------------------------------------------------------------------- */
+
 HIDReportDescriptor::HIDReportDescriptor(const uint8_t *hid_report_data, uint16_t hid_report_data_len)
 {
     parse(hid_report_data, hid_report_data_len);
@@ -107,7 +113,7 @@ void HIDReportDescriptor::parse(const uint8_t *hid_report_data, uint16_t hid_rep
 
     for (auto report: hid_report_usage)
     {
-        m_reports.push_back(std::make_shared<HIDIOReport>((HIDIOReportType)report.usages[0].sub_type));
+        m_reports.push_back(HIDIOReport((HIDIOReportType)report.usages[0].sub_type));
 
         for (size_t k = 1; k < report.usages.size(); k++)
         {
@@ -115,11 +121,11 @@ void HIDReportDescriptor::parse(const uint8_t *hid_report_data, uint16_t hid_rep
             HIDUsage &usage = report.usages[k];
 
             if (usage.io_type == HIDUsageIOType::Input)
-                ioblocks = &m_reports.back()->inputs;
+                ioblocks = &m_reports.back().inputs;
             else if (usage.io_type == HIDUsageIOType::Output)
-                ioblocks = &m_reports.back()->outputs;
+                ioblocks = &m_reports.back().outputs;
             else if (usage.io_type == HIDUsageIOType::Feature)
-                ioblocks = &m_reports.back()->features;
+                ioblocks = &m_reports.back().features;
             else
                 continue;
 

@@ -26,9 +26,10 @@ HIDJoystickData::~HIDJoystickData()
 /* ----------------------------------------------- */
 
 
-HIDJoystick::HIDJoystick(std::shared_ptr<HIDReportDescriptor> descriptor) 
+HIDJoystick::HIDJoystick(const HIDReportDescriptor &descriptor) 
 {
-	this->descriptor = descriptor;
+	this->m_descriptor = descriptor;
+	this->m_reports = descriptor.GetReports();
 }
 
 /* ----------------------------------------------- */
@@ -43,10 +44,10 @@ uint8_t HIDJoystick::getCount()
 {
 	uint8_t count = 0;
 
-	for (auto report: descriptor->GetReports())
+	for (auto report: this->m_reports)
 	{
-		if (report->report_type == HIDIOReportType::Joystick
-			|| report->report_type == HIDIOReportType::GamePad)
+		if (report.report_type == HIDIOReportType::Joystick
+			|| report.report_type == HIDIOReportType::GamePad)
 			count++;
 	}
 
@@ -59,14 +60,14 @@ bool HIDJoystick::parseData(uint8_t *data, uint16_t datalen, HIDJoystickData *jo
 {
 	bool found = false;
 
-	for (uint32_t i=0; i< descriptor->GetReports().size(); i++)
+	for (uint32_t i=0; i< this->m_reports.size(); i++)
 	{
-		auto report = descriptor->GetReports()[i];
+		auto report = this->m_reports[i];
 
-		if (report->report_type != HIDIOReportType::Joystick && report->report_type != HIDIOReportType::GamePad)
+		if (report.report_type != HIDIOReportType::Joystick && report.report_type != HIDIOReportType::GamePad)
 			continue;
 
-		for (auto ioblock: report->inputs)
+		for (auto ioblock: report.inputs)
 		{
 			uint32_t bitOffset = 0;
 
@@ -96,32 +97,32 @@ bool HIDJoystick::parseData(uint8_t *data, uint16_t datalen, HIDJoystickData *jo
 				else if (input.type == HIDIOType::X)
 				{
 					joystick_data->support |= JOYSTICK_SUPPORT_X;
-					joystick_data->X =value;
+					joystick_data->X = (int32_t)value;
 				}
 				else if (input.type == HIDIOType::Y)
 				{
 					joystick_data->support |= JOYSTICK_SUPPORT_Y;
-					joystick_data->Y = value;
+					joystick_data->Y = (int32_t)value;
 				}
 				else if (input.type == HIDIOType::Z)
 				{
 					joystick_data->support |= JOYSTICK_SUPPORT_Z;
-					joystick_data->Z = value;
+					joystick_data->Z = (int32_t)value;
 				}
 				else if (input.type == HIDIOType::Rx)
 				{
 					joystick_data->support |= JOYSTICK_SUPPORT_Rx;
-					joystick_data->Rx = value;
+					joystick_data->Rx = (int32_t)value;
 				}
 				else if (input.type == HIDIOType::Ry)
 				{
 					joystick_data->support |= JOYSTICK_SUPPORT_Ry;
-					joystick_data->Ry = value;
+					joystick_data->Ry = (int32_t)value;
 				}
 				else if (input.type == HIDIOType::Rz)
 				{
 					joystick_data->support |= JOYSTICK_SUPPORT_Rz;
-					joystick_data->Rz = value;
+					joystick_data->Rz = (int32_t)value;
 				}
 				else if (input.type == HIDIOType::HatSwitch)
 				{

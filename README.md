@@ -1,10 +1,13 @@
 # Introduction
-This project aims to provide a platform independent HID report descriptor parser and data parser.
-It allows to parse and access data from a USB device in an abstract manner.
+  This project aims to provide a platform independent HID report descriptor parser and HID data parser.
+  It allows to decode data from an USB HID device without the need to have an operating system.
+  Usually, this parsing and decoding are applied by the operating system at low level.
+  However if you need to parse HID data from MCU or for any other purpose, this library might help you.
+
 
 # Supported devices
-[X] Joystick
-[X] Gamepad
+  [X] Joystick
+  [X] Gamepad
 
 # Architecture
 ```
@@ -58,22 +61,31 @@ https://asciiflow.com/
 # Usage
 
 ```
-#include "HID.h"
+    #include "HIDReportDescriptor.h"
+    #include "HIDJoystick.h"
 
-uint_8_t *hid_report_data[1024]; //hid report read from USB
-//libusb_control_transfer(handle, LIBUSB_ENDPOINT_IN|LIBUSB_RECIPIENT_INTERFACE, LIBUSB_REQUEST_GET_DESCRIPTOR, (LIBUSB_DT_REPORT << 8)|interface_num, 0, hid_report_data, sizeof(hid_report_data), 5000);
+    HIDJoystickData joystick_data;
+    uint_8_t *hid_report_data[1024]; //RAW hid report read from USB
 
-HIDReportDescriptor hidReport = HIDReportDescriptor(hid_report_data);
-HIDDevice *dev = HIDFactory::createHidDevice(hidReport.getDeviceDesc(i));
+        //Read hid report descriptor using libusb
+    int report_size = libusb_control_transfer(handle, LIBUSB_ENDPOINT_IN|LIBUSB_RECIPIENT_INTERFACE, LIBUSB_REQUEST_GET_DESCRIPTOR, (LIBUSB_DT_REPORT << 8)|interface_num, 0, hid_report_data, sizeof(hid_report_data), 5000);
 
-if (dev->getType == HIDDeviceType::Joystick)
-{
-    HIDDeviceJoystick *joystick = std::static_cast<HIDDeviceJoystick>(dev);
-    while (True)
+    if (report_size > 0)
     {
-        uint_8_t *usb_data = {/*...*/} //Read data from usb
-        std::shared_ptr<HIDJoystickData> data = joystick.parse(usb_data);
-        cout << "X: " << data->getX() << " Y: " data->getY() << " Btn0: " data->getButton(0)
+        HIDReportDescriptor report_desc(report_data, report_size);
+    
+        HIDJoystick joystick(report_desc);
+
+	    
+        while (True)
+        {
+            uint_8_t *usb_data = {/*...*/} //Read data from usb
+
+            if ( joystick.parseData(data, sizeof(data), &joystick_data) )
+            {
+                cout << "X: " << joystick_data.X << " Y: " joystick_data.Y << " Btn1: " joystick_data.buttons[1]
+            }
+        }
     }
 }
 ```
