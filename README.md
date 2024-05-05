@@ -1,15 +1,30 @@
-# Introduction
+# HID Data Interpreter 
+
+#### A HID Report Descriptor parser with data parsing (Joystick, Gamepad, Keyboard, Mouse)
+
+## Description
   This project aims to provide a platform independent HID report descriptor parser and HID data parser.
   It allows to decode data from an USB HID device without the need to have an operating system.
   Usually, this parsing and decoding are applied by the operating system at low level.
-  However if you need to parse HID data from MCU or for any other purpose, this library might help you.
+  However if you need to parse HID data from MCU or for any other purpose, this library might be helpful.
 
 
-# Supported devices
-  [X] Joystick
-  [X] Gamepad
+## Supported devices
 
-# Architecture
+- [X] Joystick
+- [X] Gamepad
+
+## Building (For developers)
+
+	Use CMAKE in cmd line or vscode with CMAKE plugin and TestMate.
+
+```
+	cmake . build
+	cd build
+	make
+```
+
+### Architecture
 ```
                                                     
                    ┌─────────────────────────────┐
@@ -58,7 +73,7 @@ Joystick Raw data  │                             │
 ```
 https://asciiflow.com/
 
-# Usage
+### Usage
 
 ```
     #include "HIDReportDescriptor.h"
