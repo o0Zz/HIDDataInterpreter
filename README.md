@@ -16,12 +16,12 @@
 
 ## Building (For developers)
 
-	Use CMAKE in cmd line or vscode with CMAKE plugin and TestMate.
+Use CMAKE in cmd line or vscode with CMAKE plugin and TestMate.
 
 ```
-	cmake . build
-	cd build
-	make
+cmake . build
+cd build
+make
 ```
 
 ### Architecture
