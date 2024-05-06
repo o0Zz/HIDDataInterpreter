@@ -7,60 +7,59 @@
 #include <algorithm>
 
 //---------------USAGE_PAGE-----------------
-#define USAGE_PAGE_GenericDesktop       0x01
-#define USAGE_PAGE_Simulation           0x02
-#define USAGE_PAGE_VR                   0x03
-#define USAGE_PAGE_Sport                0x04
-#define USAGE_PAGE_Game                 0x05
-#define USAGE_PAGE_GenericDevice        0x06
-#define USAGE_PAGE_Keyboard             0x07
-#define USAGE_PAGE_LEDs                 0x08
-#define USAGE_PAGE_Button               0x09
-#define USAGE_PAGE_Ordinal              0x0A
-#define USAGE_PAGE_Telephony            0x0B
-#define USAGE_PAGE_Consumer             0x0C
-#define USAGE_PAGE_VendorDefined        0xFF00
+#define USAGE_PAGE_GenericDesktop 0x01
+#define USAGE_PAGE_Simulation     0x02
+#define USAGE_PAGE_VR             0x03
+#define USAGE_PAGE_Sport          0x04
+#define USAGE_PAGE_Game           0x05
+#define USAGE_PAGE_GenericDevice  0x06
+#define USAGE_PAGE_Keyboard       0x07
+#define USAGE_PAGE_LEDs           0x08
+#define USAGE_PAGE_Button         0x09
+#define USAGE_PAGE_Ordinal        0x0A
+#define USAGE_PAGE_Telephony      0x0B
+#define USAGE_PAGE_Consumer       0x0C
+#define USAGE_PAGE_VendorDefined  0xFF00
 
 //---------------USAGE-----------------
-#define USAGE_X             0x30
-#define USAGE_Y             0x31
-#define USAGE_Z             0x32
-#define USAGE_Rx            0x33
-#define USAGE_Ry            0x34
-#define USAGE_Rz            0x35
-#define USAGE_Slider        0x36
-#define USAGE_Dial          0x37
-#define USAGE_Wheel         0x38
-#define USAGE_Hat_switch    0x39
+#define USAGE_X          0x30
+#define USAGE_Y          0x31
+#define USAGE_Z          0x32
+#define USAGE_Rx         0x33
+#define USAGE_Ry         0x34
+#define USAGE_Rz         0x35
+#define USAGE_Slider     0x36
+#define USAGE_Dial       0x37
+#define USAGE_Wheel      0x38
+#define USAGE_Hat_switch 0x39
 
 //---------------INPUT-----------------
-#define INPUT_Const         0x01
-#define INPUT_Var           0x02
-#define INPUT_Rel           0x04
-#define INPUT_Wrap          0x08
-#define INPUT_NLin          0x10
-#define INPUT_NPrf          0x20
-#define INPUT_Null          0x40
-#define INPUT_Vol           0x80
+#define INPUT_Const 0x01
+#define INPUT_Var   0x02
+#define INPUT_Rel   0x04
+#define INPUT_Wrap  0x08
+#define INPUT_NLin  0x10
+#define INPUT_NPrf  0x20
+#define INPUT_Null  0x40
+#define INPUT_Vol   0x80
 
 //---------------COLLECTION-----------------
-#define HID_COLLECTION_PHYSICAL 0x00
-#define HID_COLLECTION_APPLICATION 0x01
-#define HID_COLLECTION_LOGICAL 0x02
-#define HID_COLLECTION_REPORT 0x03
-#define HID_COLLECTION_NAMED_ARRAY 0x04
-#define HID_COLLECTION_USAGE_SWITCH 0x05
+#define HID_COLLECTION_PHYSICAL       0x00
+#define HID_COLLECTION_APPLICATION    0x01
+#define HID_COLLECTION_LOGICAL        0x02
+#define HID_COLLECTION_REPORT         0x03
+#define HID_COLLECTION_NAMED_ARRAY    0x04
+#define HID_COLLECTION_USAGE_SWITCH   0x05
 #define HID_COLLECTION_USAGE_MODIFIER 0x06
 
 /* -------------------------------------------------------------------------- */
 
-HIDUsage::HIDUsage(HIDUsageType type, uint32_t sub_type, HIDUsageIOType io_type, HIDProperty property) : 
-    type(type), 
-    sub_type(sub_type),
-    usage_min(0), 
-    usage_max(0),
-    io_type(io_type),
-    property(property)
+HIDUsage::HIDUsage(HIDUsageType type, uint32_t sub_type, HIDUsageIOType io_type, HIDProperty property) : type(type),
+                                                                                                         sub_type(sub_type),
+                                                                                                         usage_min(0),
+                                                                                                         usage_max(0),
+                                                                                                         io_type(io_type),
+                                                                                                         property(property)
 {
     if (sub_type != 0)
     {
@@ -73,20 +72,18 @@ HIDUsage::HIDUsage(HIDUsageType type, uint32_t sub_type, HIDUsageIOType io_type,
 
 HIDUsage::~HIDUsage()
 {
-
 }
 
 /* -------------------------------------------------------------------------- */
 
-HIDProperty::HIDProperty(uint32_t size, uint32_t count) : 
-        logical_min(0), 
-        logical_max(0), 
-        physical_min(0), 
-        physical_max(0), 
-        unit(0), 
-        unit_exponent(0), 
-        size(size), 
-        count(count) 
+HIDProperty::HIDProperty(uint32_t size, uint32_t count) : logical_min(0),
+                                                          logical_max(0),
+                                                          physical_min(0),
+                                                          physical_max(0),
+                                                          unit(0),
+                                                          unit_exponent(0),
+                                                          size(size),
+                                                          count(count)
 {
 }
 
@@ -94,7 +91,6 @@ HIDProperty::HIDProperty(uint32_t size, uint32_t count) :
 
 HIDProperty::~HIDProperty()
 {
-
 }
 
 /* -------------------------------------------------------------------------- */
@@ -138,7 +134,7 @@ std::vector<HIDReport> HIDReportDescriptorUsages::parse(const std::vector<HIDEle
             case HIDElementType::HID_USAGE_PAGE:
                 current_usage_page = &element;
                 break;
-            
+
             case HIDElementType::HID_USAGE:
                 current_usages.push_back(HIDUsage(convert_usage_page(current_usage_page->GetValueUint32()), element.GetValueUint32()));
                 break;
@@ -148,17 +144,17 @@ std::vector<HIDReport> HIDReportDescriptorUsages::parse(const std::vector<HIDEle
             {
                 if (current_usages.size() == 0)
                     current_usages.push_back(HIDUsage(convert_usage_page(current_usage_page->GetValueUint32())));
-                
+
                 for (HIDUsage &usage : current_usages)
                 {
                     if (element.GetType() == HIDElementType::HID_USAGE_MINIMUM)
                         usage.usage_min = element.GetValueUint32();
                     else if (element.GetType() == HIDElementType::HID_USAGE_MAXIMUM)
                         usage.usage_max = element.GetValueUint32();
-                } 
+                }
                 break;
             }
-            
+
             case HIDElementType::HID_REPORT_ID:
                 current_report_id = element.GetValueUint32();
                 break;
@@ -190,7 +186,7 @@ std::vector<HIDReport> HIDReportDescriptorUsages::parse(const std::vector<HIDEle
             case HIDElementType::HID_REPORT_SIZE:
                 current_property.size = element.GetValueUint32();
                 break;
-                
+
             case HIDElementType::HID_REPORT_COUNT:
                 current_property.count = element.GetValueUint32();
                 break;
@@ -228,7 +224,7 @@ std::vector<HIDReport> HIDReportDescriptorUsages::parse(const std::vector<HIDEle
                 break;
             }
 
-                //For now collections are ignored
+                // For now collections are ignored
             case HIDElementType::HID_COLLECTION:
             {
                 if (element.GetValueUint32() == HID_COLLECTION_APPLICATION)
@@ -243,6 +239,18 @@ std::vector<HIDReport> HIDReportDescriptorUsages::parse(const std::vector<HIDEle
             {
                 break;
             }
+
+            case HIDElementType::HID_UNKNOWN:
+            case HIDElementType::HID_PUSH:
+            case HIDElementType::HID_POP:
+            case HIDElementType::HID_DELIMITER:
+            case HIDElementType::HID_DESIGNATOR_INDEX:
+            case HIDElementType::HID_DESIGNATOR_MINIMUM:
+            case HIDElementType::HID_DESIGNATOR_MAXIMUM:
+            case HIDElementType::HID_STRING_INDEX:
+            case HIDElementType::HID_STRING_MINIMUM:
+            case HIDElementType::HID_STRING_MAXIMUM:
+                break;
         }
     }
 

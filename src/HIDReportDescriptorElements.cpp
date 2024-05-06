@@ -1,22 +1,22 @@
 #include "HIDReportDescriptorElements.h"
+#include <cstring>
 
-//https://docs.kernel.org/hid/hidreport-parsing.html
+// https://docs.kernel.org/hid/hidreport-parsing.html
 #define HID_FUNC_TYPE_MASK 0xFC
-#define HID_TYPE_MASK 0x0C
-#define HID_LENGTH_MASK 0x03
+#define HID_TYPE_MASK      0x0C
+#define HID_LENGTH_MASK    0x03
 
 /* -------------------------------------------------------------------------- */
 
-HIDElement::HIDElement() :
-    type(HIDElementType::HID_UNKNOWN),
-    data_size(0)
+HIDElement::HIDElement() : type(HIDElementType::HID_UNKNOWN),
+                           data_size(0)
 {
     memset(data, 0x00, sizeof(data));
 }
 
 /* -------------------------------------------------------------------------- */
 
-HIDElement::~HIDElement() 
+HIDElement::~HIDElement()
 {
 }
 
@@ -54,12 +54,13 @@ std::vector<HIDElement> HIDReportDescriptorElements::parse(const uint8_t *hid_re
     {
         uint8_t type = hid_report_data[offset];
         uint8_t datalen = type & HID_LENGTH_MASK;
-        if (datalen == 3) datalen = 4;
+        if (datalen == 3)
+            datalen = 4;
 
         elements.push_back(HIDElement((HIDElementType)(type & HID_FUNC_TYPE_MASK), &hid_report_data[offset + 1], datalen));
 
         offset += 1 + datalen;
     }
 
-    return elements;  
+    return elements;
 }
