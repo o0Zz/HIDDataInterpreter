@@ -1,0 +1,7 @@
+THIS_MAKEFILE     := $(abspath $(lastword $(MAKEFILE_LIST)))
+CURRENT_DIRECTORY := $(abspath $(dir $(THIS_MAKEFILE)))
+
+HIDDATAINTERPRETER_INCLUDE_DIR := $(CURRENT_DIRECTORY)/../../inc
+HIDDATAINTERPRETER_LIBRARY_DIR := $(CURRENT_DIRECTORY)/lib
+
+export LIBS := $(LIBS) -lhiddatainterpreter

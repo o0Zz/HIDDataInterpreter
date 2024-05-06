@@ -38,6 +38,13 @@ HIDJoystick::~HIDJoystick()
 
 /* ----------------------------------------------- */
 
+bool HIDJoystick::isValid()
+{
+    return getCount() > 0;
+}
+
+/* ----------------------------------------------- */
+
 uint8_t HIDJoystick::getCount()
 {
     uint8_t count = 0;
