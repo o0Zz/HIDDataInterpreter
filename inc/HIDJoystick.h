@@ -33,12 +33,12 @@ public:
 
     uint8_t support;
 
-    int16_t X;
-    int16_t Y;
-    int16_t Z;
-    int16_t Rx;
-    int16_t Ry;
-    int16_t Rz;
+    int16_t X; //-32768 to 32767
+    int16_t Y; //-32768 to 32767
+    int16_t Z; //-32768 to 32767
+    int16_t Rx; //-32768 to 32767
+    int16_t Ry; //-32768 to 32767
+    int16_t Rz; //-32768 to 32767
     HIDJoystickHatSwitch hat_switch;
 
     uint8_t button_count;

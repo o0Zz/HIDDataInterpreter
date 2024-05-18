@@ -326,7 +326,7 @@ TEST(PS4, test_input_parsing_left)
 	
 	GTEST_ASSERT_EQ(joystick.parseData(data, sizeof(data), &joystick_data), true);
 
-	GTEST_ASSERT_EQ(joystick_data.X, 0);
+	GTEST_ASSERT_EQ(joystick_data.X, -32768);
 }
 
 TEST(PS4, test_input_parsing_hatswitch_up)

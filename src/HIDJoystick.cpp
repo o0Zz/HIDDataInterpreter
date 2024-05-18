@@ -2,6 +2,15 @@
 #include "HIDUtils.h"
 #include <cstring>
 
+/* ----------------------------------------------- */
+
+static int32_t mapValue(int32_t value, int32_t in_min, int32_t in_max, int32_t out_min, int32_t out_max)
+{
+    return (value - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+}
+
+/* ----------------------------------------------- */
+
 HIDJoystickData::HIDJoystickData() : index(0xFF),
                                      support(0),
                                      X(0),
@@ -101,32 +110,32 @@ bool HIDJoystick::parseData(uint8_t *data, uint16_t datalen, HIDJoystickData *jo
                 else if (input.type == HIDIOType::X)
                 {
                     joystick_data->support |= JOYSTICK_SUPPORT_X;
-                    joystick_data->X = (int32_t)value;
+                    joystick_data->X = mapValue(value, input.logical_min, input.logical_max, -32768, 32767);
                 }
                 else if (input.type == HIDIOType::Y)
                 {
                     joystick_data->support |= JOYSTICK_SUPPORT_Y;
-                    joystick_data->Y = (int32_t)value;
+                    joystick_data->Y = mapValue(value, input.logical_min, input.logical_max, -32768, 32767);
                 }
                 else if (input.type == HIDIOType::Z)
                 {
                     joystick_data->support |= JOYSTICK_SUPPORT_Z;
-                    joystick_data->Z = (int32_t)value;
+                    joystick_data->Z = mapValue(value, input.logical_min, input.logical_max, -32768, 32767);
                 }
                 else if (input.type == HIDIOType::Rx)
                 {
                     joystick_data->support |= JOYSTICK_SUPPORT_Rx;
-                    joystick_data->Rx = (int32_t)value;
+                    joystick_data->Rx = mapValue(value, input.logical_min, input.logical_max, -32768, 32767);
                 }
                 else if (input.type == HIDIOType::Ry)
                 {
                     joystick_data->support |= JOYSTICK_SUPPORT_Ry;
-                    joystick_data->Ry = (int32_t)value;
+                    joystick_data->Ry = mapValue(value, input.logical_min, input.logical_max, -32768, 32767);
                 }
                 else if (input.type == HIDIOType::Rz)
                 {
                     joystick_data->support |= JOYSTICK_SUPPORT_Rz;
-                    joystick_data->Rz = (int32_t)value;
+                    joystick_data->Rz = mapValue(value, input.logical_min, input.logical_max, -32768, 32767);
                 }
                 else if (input.type == HIDIOType::HatSwitch)
                 {

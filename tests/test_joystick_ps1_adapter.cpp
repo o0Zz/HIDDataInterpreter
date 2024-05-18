@@ -105,5 +105,5 @@ TEST(PS1, test_input_parsing_neutral)
 	
 		//We should not be able to parse the data because reportID 1 is not present in report_data
 	GTEST_ASSERT_EQ(joystick.parseData(data, sizeof(data), &joystick_data), true);
-	GTEST_ASSERT_EQ(joystick_data.X, 127);
+	GTEST_ASSERT_EQ(joystick_data.X, -129);
 }
