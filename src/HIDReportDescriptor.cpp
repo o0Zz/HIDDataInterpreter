@@ -8,41 +8,37 @@
 #include <cassert>
 #include <algorithm>
 
-//https://github.com/pasztorpisti/hid-report-parser/blob/master/src/hid_report_parser.cpp
-//https://docs.kernel.org/hid/hidintro.html
+// https://github.com/pasztorpisti/hid-report-parser/blob/master/src/hid_report_parser.cpp
+// https://docs.kernel.org/hid/hidintro.html
 
-HIDInputOutput::HIDInputOutput(HIDIOType type, uint32_t size, uint32_t id) : 
-    type(type), 
-    sub_type(0),
-    size(size),
-    id(id),
-    logical_min(0), 
-    logical_max(0), 
-    physical_min(0), 
-    physical_max(0), 
-    unit(0),
-    unit_exponent(0) 
+HIDInputOutput::HIDInputOutput(HIDIOType type, uint32_t size, uint32_t id) : type(type),
+                                                                             sub_type(0),
+                                                                             size(size),
+                                                                             id(id),
+                                                                             logical_min(0),
+                                                                             logical_max(0),
+                                                                             physical_min(0),
+                                                                             physical_max(0),
+                                                                             unit(0),
+                                                                             unit_exponent(0)
 {
-
 }
 
 HIDInputOutput::~HIDInputOutput()
 {
-
 }
 
-HIDInputOutput::HIDInputOutput(const HIDUsage &usage, uint32_t idx) : 
-    type(HIDIOType::Unknown),
-    sub_type(0),
-    size(usage.property.size),
-    id(0),
-    logical_min(usage.property.logical_min),
-    logical_max(usage.property.logical_max),
-    physical_min(usage.property.physical_min), 
-    physical_max(usage.property.physical_max), 
-    unit(usage.property.unit), 
-    unit_exponent(usage.property.unit_exponent) 
-{           
+HIDInputOutput::HIDInputOutput(const HIDUsage &usage, uint32_t idx) : type(HIDIOType::Unknown),
+                                                                      sub_type(0),
+                                                                      size(usage.property.size),
+                                                                      id(0),
+                                                                      logical_min(usage.property.logical_min),
+                                                                      logical_max(usage.property.logical_max),
+                                                                      physical_min(usage.property.physical_min),
+                                                                      physical_max(usage.property.physical_max),
+                                                                      unit(usage.property.unit),
+                                                                      unit_exponent(usage.property.unit_exponent)
+{
     if (usage.type == HIDUsageType::GenericDesktop)
     {
         if (usage.sub_type == (uint32_t)HIDUsageGenericDesktopSubType::X)
@@ -98,7 +94,6 @@ HIDReportDescriptor::HIDReportDescriptor(const uint8_t *hid_report_data, uint16_
 
 HIDReportDescriptor::~HIDReportDescriptor()
 {
-
 }
 
 /* -------------------------------------------------------------------- */
@@ -111,7 +106,7 @@ void HIDReportDescriptor::parse(const uint8_t *hid_report_data, uint16_t hid_rep
     std::vector<HIDInputOutput> current_data;
     uint32_t current_size = 0;
 
-    for (auto report: hid_report_usage)
+    for (auto report : hid_report_usage)
     {
         m_reports.push_back(HIDIOReport((HIDIOReportType)report.usages[0].sub_type));
 
@@ -135,8 +130,8 @@ void HIDReportDescriptor::parse(const uint8_t *hid_report_data, uint16_t hid_rep
                 current_size += usage.property.size;
             }
 
-                //If we read enough data to have a complete byte, we can reorder them and add it to the data
-            if (current_size%8 == 0)
+            // If we read enough data to have a complete byte, we can reorder them and add it to the data
+            if (current_size % 8 == 0)
             {
                 std::vector<HIDInputOutput> ordered_current_data;
 
@@ -151,7 +146,7 @@ void HIDReportDescriptor::parse(const uint8_t *hid_report_data, uint16_t hid_rep
                         if (current_data[i].type == HIDIOType::ReportId || ioblocks->size() == 0)
                             ioblocks->push_back(HIDIOBlock());
 
-                        std::reverse(ordered_current_data.begin(), ordered_current_data.end()); //Data is stored in little endian, so reverse it
+                        std::reverse(ordered_current_data.begin(), ordered_current_data.end()); // Data is stored in little endian, so reverse it
                         ioblocks->back().data.insert(ioblocks->back().data.end(), ordered_current_data.begin(), ordered_current_data.end());
                         ordered_current_data.clear();
                         data_len = 0;
