@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 #include "HIDReportDescriptor.h"
-#include <HIDJoystick.h>
+#include "HIDJoystick.h"
 
 const uint8_t report_data[] = {
 	0x05, 0x01,        // Usage Page (Generic Desktop Ctrls)
@@ -72,11 +72,11 @@ TEST(PS1, test_report_correct_inputs)
 	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].inputs[0].data[2].type, HIDIOType::Rz);
 	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].inputs[0].data[3].type, HIDIOType::X);
 	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].inputs[0].data[4].type, HIDIOType::Y);
-	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].inputs[0].data[5].type, HIDIOType::Button);
+	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].inputs[0].data[5].type, HIDIOType::HatSwitch);
 	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].inputs[0].data[6].type, HIDIOType::Button);
 	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].inputs[0].data[7].type, HIDIOType::Button);
 	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].inputs[0].data[8].type, HIDIOType::Button);
-	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].inputs[0].data[9].type, HIDIOType::HatSwitch);
+	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].inputs[0].data[9].type, HIDIOType::Button);
 	// Buttons are ignored
 	// Padding is ignored
 }
@@ -87,7 +87,7 @@ TEST(PS1, test_input_parsing_incorrect_report_id)
 		0x01, 0x7f, 0x7f, 0x7f, 0x7f, 0x0f, 0x00, 0x00
 		};
 
-	HIDJoystick joystick(HIDReportDescriptor(report_data, (uint16_t)sizeof(report_data)));
+	HIDJoystick joystick(std::make_shared<HIDReportDescriptor>(report_data, (uint16_t)sizeof(report_data)));
 	HIDJoystickData joystick_data;
 	
 		//We should not be able to parse the data because reportID 1 is not present in report_data
@@ -100,7 +100,7 @@ TEST(PS1, test_input_parsing_neutral)
 		0x02, 0x7f, 0x7f, 0x7f, 0x7f, 0x0f, 0x00, 0x00
 		};
 
-	HIDJoystick joystick(HIDReportDescriptor(report_data, (uint16_t)sizeof(report_data)));
+	HIDJoystick joystick(std::make_shared<HIDReportDescriptor>(report_data, (uint16_t)sizeof(report_data)));
 	HIDJoystickData joystick_data;
 	
 		//We should not be able to parse the data because reportID 1 is not present in report_data

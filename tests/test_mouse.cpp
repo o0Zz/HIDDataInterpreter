@@ -61,8 +61,8 @@ TEST(MOUSE, test_report_correct_inputs)
 {
 	HIDReportDescriptor hid_report_descriptor(report_data, (uint16_t)sizeof(report_data));
 	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].inputs[0].data.size(), 13);
-	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].inputs[0].data[0].type, HIDIOType::Padding);
-	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].inputs[0].data[7].type, HIDIOType::Button);
+	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].inputs[0].data[0].type, HIDIOType::Button);
+	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].inputs[0].data[5].type, HIDIOType::Padding);
 	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].inputs[0].data[8].type, HIDIOType::VendorDefined);
 	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].inputs[0].data[10].type, HIDIOType::Wheel);
 	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].inputs[0].data[11].type, HIDIOType::X);

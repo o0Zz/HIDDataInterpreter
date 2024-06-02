@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 #include "HIDReportDescriptor.h"
-#include <HIDJoystick.h>
+#include "HIDJoystick.h"
 
 const uint8_t report_data[] = {
 	0x05, 0x01,        // Usage Page (Generic Desktop Ctrls)
@@ -122,8 +122,8 @@ TEST(XBOX360, test_report_correct_inputs)
 	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].inputs[0].data[10].type, HIDIOType::Button);
 	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].inputs[0].data[11].type, HIDIOType::Button);
 	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].inputs[0].data[12].type, HIDIOType::Button);
-	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].inputs[0].data[13].type, HIDIOType::Button);
-	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].inputs[0].data[14].type, HIDIOType::Padding);
+	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].inputs[0].data[13].type, HIDIOType::Padding);
+	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].inputs[0].data[14].type, HIDIOType::Button);
 	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].inputs[0].data[15].type, HIDIOType::Button);
 	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].inputs[0].data[16].type, HIDIOType::Button);
 	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].inputs[0].data[17].type, HIDIOType::Button);
@@ -139,7 +139,7 @@ TEST(XBOX360, test_report_correct_inputs)
 TEST(XBOX360, test_input_parsing_button1)
 {
 	uint8_t data[] = {0x00, 0x14, 0x00, 0x10, 0x00, 0x00, 0xcd, 0x01, 0x36, 0xfd, 0x2c, 0x03, 0xe9, 0xfb, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
-	HIDJoystick joystick(HIDReportDescriptor(report_data, (uint16_t)sizeof(report_data)));
+	HIDJoystick joystick(std::make_shared<HIDReportDescriptor>(report_data, (uint16_t)sizeof(report_data)));
 	HIDJoystickData joystick_data;
 	
 	GTEST_ASSERT_EQ(joystick.parseData(data, sizeof(data), &joystick_data), true);

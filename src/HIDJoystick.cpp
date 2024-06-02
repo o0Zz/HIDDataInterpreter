@@ -85,7 +85,7 @@ bool HIDJoystick::parseData(uint8_t *data, uint16_t datalen, HIDJoystickData *jo
 
             for (auto input : ioblock.data)
             {
-                uint32_t value = HIDUtils::readBits(data, bitOffset, input.size);
+                uint32_t value = HIDUtils::readBitsLE(data, bitOffset, input.size);
                 bitOffset += input.size;
 
                 if (input.type == HIDIOType::ReportId)

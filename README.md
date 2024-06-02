@@ -87,8 +87,8 @@ https://asciiflow.com/
 
     if (report_size > 0)
     {
-        HIDReportDescriptor report_desc(report_data, report_size);
-    
+        std::shared_ptr<HIDReportDescriptor> report_desc = std::make_shared<HIDReportDescriptor>(report_data, (uint16_t)sizeof(report_data));
+
         HIDJoystick joystick(report_desc);
 
 	    
