@@ -114,9 +114,9 @@ TEST(HID, test_report_has_correct_inputs)
 	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].inputs[0].data[1].type, HIDIOType::X);
 	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].inputs[0].data[2].type, HIDIOType::Y);
 	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].inputs[0].data[3].type, HIDIOType::Button);
-	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].inputs[0].data[11].type, HIDIOType::Padding);
-	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].inputs[0].data[19].type, HIDIOType::Padding);
-	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].inputs[0].data[20].type, HIDIOType::HatSwitch);
+	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].inputs[0].data[18].type, HIDIOType::Padding);
+	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].inputs[0].data[19].type, HIDIOType::HatSwitch);
+	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].inputs[0].data[20].type, HIDIOType::Padding);
 }
 
 
