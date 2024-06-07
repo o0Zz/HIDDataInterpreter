@@ -88,6 +88,9 @@ bool HIDJoystick::parseData(uint8_t *data, uint16_t datalen, HIDJoystickData *jo
                 uint32_t value = HIDUtils::readBitsLE(data, bitOffset, input.size);
                 bitOffset += input.size;
 
+                if (bitOffset > datalen * 8)
+                    return false; // Out of range
+
                 if (input.type == HIDIOType::ReportId)
                 {
                     if (value != input.id)
