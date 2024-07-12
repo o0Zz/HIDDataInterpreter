@@ -1,6 +1,7 @@
 #pragma once
 #include <memory>
 #include <vector>
+#include <stdint.h>
 
 /* -------------------------------------------------------------------------- */
 
@@ -59,5 +60,32 @@ private:
 class HIDReportDescriptorElements
 {
 public:
-    static std::vector<HIDElement> parse(const uint8_t *hid_report_data, uint16_t hid_report_data_len);
+    HIDReportDescriptorElements(const uint8_t *hid_report_data, uint16_t hid_report_data_len);
+    ~HIDReportDescriptorElements();
+
+    class Iterator {
+        public:
+            Iterator(const uint8_t* hid_report_data, uint16_t hid_report_data_len, uint16_t offset = 0);
+            HIDElement& operator*();
+            HIDElement* operator->();
+            Iterator& operator++();
+            
+            bool operator!=(const Iterator& other) const;
+
+        private:
+            void parse_current_element() ;
+
+            const uint8_t* hid_report_data;
+            uint16_t hid_report_data_len;
+            uint16_t offset;
+            HIDElement current_element;
+            uint8_t current_element_length;
+    };
+
+    Iterator begin() const;
+    Iterator end() const;
+
+private:
+    const uint8_t *hid_report_data;
+    uint16_t hid_report_data_len;
 };

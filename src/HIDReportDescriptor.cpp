@@ -100,7 +100,7 @@ HIDReportDescriptor::~HIDReportDescriptor()
 
 void HIDReportDescriptor::parse(const uint8_t *hid_report_data, uint16_t hid_report_data_len)
 {
-    std::vector<HIDElement> hid_report_elements = HIDReportDescriptorElements::parse(hid_report_data, hid_report_data_len);
+    HIDReportDescriptorElements hid_report_elements = HIDReportDescriptorElements(hid_report_data, hid_report_data_len);
     std::vector<HIDReport> hid_report_usage = HIDReportDescriptorUsages::parse(hid_report_elements);
     for (auto report : hid_report_usage)
     {

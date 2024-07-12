@@ -7,6 +7,5 @@ public:
 	HIDUtils() {}
 	~HIDUtils() {}
 
-	static uint32_t readBits(uint8_t *buffer, uint32_t bitOffset, uint32_t bitLength);
 	static uint32_t readBitsLE(uint8_t *buffer, uint32_t bitOffset, uint32_t bitLength);
 };

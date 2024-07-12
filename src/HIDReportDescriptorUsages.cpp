@@ -119,11 +119,11 @@ HIDUsageType convert_usage_page(uint32_t usage_page)
 
 /* -------------------------------------------------------------------------- */
 
-std::vector<HIDReport> HIDReportDescriptorUsages::parse(const std::vector<HIDElement> &elements)
+std::vector<HIDReport> HIDReportDescriptorUsages::parse(const HIDReportDescriptorElements &elements)
 {
     HIDProperty current_property;
     std::vector<HIDUsage> current_usages;
-    const HIDElement *current_usage_page = nullptr;
+    HIDUsageType current_usage_page_type = HIDUsageType::Unknown;
     std::vector<HIDReport> report;
     uint8_t current_report_id = 0;
 
@@ -132,18 +132,18 @@ std::vector<HIDReport> HIDReportDescriptorUsages::parse(const std::vector<HIDEle
         switch (element.GetType())
         {
             case HIDElementType::HID_USAGE_PAGE:
-                current_usage_page = &element;
+                current_usage_page_type = convert_usage_page(element.GetValueUint32());
                 break;
 
             case HIDElementType::HID_USAGE:
-                current_usages.push_back(HIDUsage(convert_usage_page(current_usage_page->GetValueUint32()), element.GetValueUint32()));
+                current_usages.push_back(HIDUsage(current_usage_page_type, element.GetValueUint32()));
                 break;
 
             case HIDElementType::HID_USAGE_MAXIMUM:
             case HIDElementType::HID_USAGE_MINIMUM:
             {
                 if (current_usages.size() == 0)
-                    current_usages.push_back(HIDUsage(convert_usage_page(current_usage_page->GetValueUint32())));
+                    current_usages.push_back(HIDUsage(current_usage_page_type));
 
                 for (HIDUsage &usage : current_usages)
                 {

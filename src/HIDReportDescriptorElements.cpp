@@ -46,21 +46,87 @@ uint32_t HIDElement::GetValueUint32() const
 
 /* -------------------------------------------------------------------------- */
 
-std::vector<HIDElement> HIDReportDescriptorElements::parse(const uint8_t *hid_report_data, uint16_t hid_report_data_len)
+ HIDReportDescriptorElements::HIDReportDescriptorElements(const uint8_t *hid_report_data, uint16_t hid_report_data_len):
+    hid_report_data(hid_report_data),
+    hid_report_data_len(hid_report_data_len)
 {
-    std::vector<HIDElement> elements;
+}
 
-    for (uint16_t offset = 0; offset < hid_report_data_len; /* ... */)
-    {
-        uint8_t type = hid_report_data[offset];
-        uint8_t datalen = type & HID_LENGTH_MASK;
-        if (datalen == 3)
-            datalen = 4;
+/* -------------------------------------------------------------------------- */
 
-        elements.push_back(HIDElement((HIDElementType)(type & HID_FUNC_TYPE_MASK), &hid_report_data[offset + 1], datalen));
+HIDReportDescriptorElements::~HIDReportDescriptorElements()
+{
+}
 
-        offset += 1 + datalen;
-    }
+/* -------------------------------------------------------------------------- */
 
-    return elements;
+HIDReportDescriptorElements::Iterator HIDReportDescriptorElements::begin() const 
+{
+    return HIDReportDescriptorElements::Iterator(hid_report_data, hid_report_data_len);
+}
+
+/* -------------------------------------------------------------------------- */
+
+HIDReportDescriptorElements::Iterator HIDReportDescriptorElements::end() const 
+{
+    return HIDReportDescriptorElements::Iterator(hid_report_data, hid_report_data_len, hid_report_data_len);
+}
+
+/* -------------------------------------------------------------------------- */
+
+HIDReportDescriptorElements::Iterator::Iterator(const uint8_t* hid_report_data, uint16_t hid_report_data_len, uint16_t offset) : 
+    hid_report_data(hid_report_data),
+    hid_report_data_len(hid_report_data_len), 
+    offset(offset) 
+{
+    if (offset < hid_report_data_len)
+        parse_current_element();
+}
+
+/* -------------------------------------------------------------------------- */
+
+HIDElement& HIDReportDescriptorElements::Iterator::operator*() 
+{
+    return current_element;
+}
+
+/* -------------------------------------------------------------------------- */
+
+HIDElement* HIDReportDescriptorElements::Iterator::operator->()
+{
+    return &current_element;
+}
+
+/* -------------------------------------------------------------------------- */
+
+HIDReportDescriptorElements::Iterator& HIDReportDescriptorElements::Iterator::operator++() 
+{
+    offset += 1 + current_element_length;
+
+    if (offset < hid_report_data_len)
+        parse_current_element();
+    else
+        offset = hid_report_data_len; // End condition
+    
+    return *this;
+}
+
+/* -------------------------------------------------------------------------- */
+
+bool HIDReportDescriptorElements::Iterator::operator!=(const Iterator& other) const 
+{
+    return offset != other.offset;
+}
+
+/* -------------------------------------------------------------------------- */
+
+void HIDReportDescriptorElements::Iterator::parse_current_element() 
+{
+    uint8_t type = hid_report_data[offset];
+    uint8_t datalen = type & HID_LENGTH_MASK;
+    if (datalen == 3)
+        datalen = 4;
+
+    current_element = HIDElement((HIDElementType)(type & HID_FUNC_TYPE_MASK), &hid_report_data[offset + 1], datalen);
+    current_element_length = datalen;
 }
