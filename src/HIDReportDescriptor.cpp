@@ -53,6 +53,10 @@ HIDInputOutput::HIDInputOutput(const HIDUsage &usage, uint32_t idx) : type(HIDIO
             this->type = HIDIOType::Ry;
         else if (usage.sub_type == (uint32_t)HIDUsageGenericDesktopSubType::Rz)
             this->type = HIDIOType::Rz;
+        else if (usage.sub_type == (uint32_t)HIDUsageGenericDesktopSubType::Slider)
+            this->type = HIDIOType::Slider;
+        else if (usage.sub_type == (uint32_t)HIDUsageGenericDesktopSubType::Dial)
+            this->type = HIDIOType::Dial;
         else if (usage.sub_type == (uint32_t)HIDUsageGenericDesktopSubType::HatSwitch)
             this->type = HIDIOType::HatSwitch;
         else if (usage.sub_type == (uint32_t)HIDUsageGenericDesktopSubType::Wheel)

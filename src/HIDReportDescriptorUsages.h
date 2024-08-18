@@ -37,6 +37,8 @@ enum class HIDUsageGenericDesktopSubType
     Rx          = 0x33,
     Ry          = 0x34,
     Rz          = 0x35,
+    Slider      = 0x36,
+    Dial        = 0x37,
     Wheel       = 0x38,
     HatSwitch   = 0x39,
 };

@@ -16,6 +16,8 @@ enum class HIDIOType
     Rx,
     Ry,
     Rz,
+    Slider,
+    Dial,
     HatSwitch,
     Wheel
 };
