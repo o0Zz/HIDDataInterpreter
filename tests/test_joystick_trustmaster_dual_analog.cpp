@@ -83,8 +83,8 @@ TEST(TRUSTMASTER, test_report_correct_inputs)
 TEST(TRUSTMASTER, test_input_parsing_slider)
 {
 	uint8_t data[64] = {	
-		//          X,    Y,    Z,    Rz,   Slider								
-		0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x7F
+		//                X,    Y,    Rz,   Slider								
+		0x00, 0x00, 0xF0, 0xDE, 0x00, 0x00, 0x80 
 		};
 
 	HIDJoystick joystick(std::make_shared<HIDReportDescriptor>(report_data, (uint16_t)sizeof(report_data)));
@@ -92,5 +92,7 @@ TEST(TRUSTMASTER, test_input_parsing_slider)
 	
 	GTEST_ASSERT_EQ(joystick.parseData(data, sizeof(data), &joystick_data), true);
 
-	GTEST_ASSERT_EQ(joystick_data.Slider, -129);
+	GTEST_ASSERT_EQ(joystick_data.Y, 128);
+	GTEST_ASSERT_EQ(joystick_data.Rz, 128);
+	GTEST_ASSERT_EQ(joystick_data.Slider, 128);
 }

@@ -35,10 +35,10 @@ public:
     uint32_t size; //Size of the data in bits
     uint32_t id; //Index of the input in the report
 
-    uint32_t logical_min;
-    uint32_t logical_max;
-    uint32_t physical_min;
-    uint32_t physical_max;
+    int32_t logical_min;
+    int32_t logical_max;
+    int32_t physical_min;
+    int32_t physical_max;
     uint32_t unit;
     uint32_t unit_exponent;
 };

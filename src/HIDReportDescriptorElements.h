@@ -46,8 +46,10 @@ public:
     HIDElement(HIDElementType type, const uint8_t *data, uint8_t data_size);
     ~HIDElement();
 
+    uint32_t GetSize() const;
     HIDElementType GetType() const;
     uint32_t GetValueUint32() const;
+    int32_t GetValueInt32() const;
 
 private:
     HIDElementType type;

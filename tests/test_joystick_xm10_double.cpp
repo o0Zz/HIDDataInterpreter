@@ -154,3 +154,16 @@ TEST(HID, test_input_parsing_2nd_joystick)
 
 	GTEST_ASSERT_EQ(joystick_data.index, 1);
 }
+
+TEST(HID, test_input_parsing_XY)
+{
+	uint8_t data[] = {0x02, 0x80, 0x80, 0x00, 0x80, 0x08};
+
+	HIDJoystick joystick(std::make_shared<HIDReportDescriptor>(report_data, (uint16_t)sizeof(report_data)));
+	HIDJoystickData joystick_data;
+
+	GTEST_ASSERT_EQ(joystick.parseData(data, sizeof(data), &joystick_data), true);
+
+	GTEST_ASSERT_EQ(joystick_data.X, 128);
+	GTEST_ASSERT_EQ(joystick_data.Y, 128);
+}

@@ -160,19 +160,23 @@ std::vector<HIDReport> HIDReportDescriptorUsages::parse(const HIDReportDescripto
                 break;
 
             case HIDElementType::HID_LOGICAL_MINIMUM:
-                current_property.logical_min = element.GetValueUint32();
+                current_property.logical_min = element.GetValueInt32();
+                current_property.logical_min_unsigned = element.GetValueUint32();
                 break;
 
             case HIDElementType::HID_LOGICAL_MAXIMUM:
-                current_property.logical_max = element.GetValueUint32();
+                current_property.logical_max = element.GetValueInt32();
+                current_property.logical_max_unsigned = element.GetValueUint32();
                 break;
 
             case HIDElementType::HID_PHYSICAL_MINIMUM:
-                current_property.physical_min = element.GetValueUint32();
+                current_property.physical_min = element.GetValueInt32();
+                current_property.physical_min_unsigned = element.GetValueUint32();
                 break;
 
             case HIDElementType::HID_PHYSICAL_MAXIMUM:
-                current_property.physical_max = element.GetValueUint32();
+                current_property.physical_max = element.GetValueInt32();
+                current_property.physical_max_unsigned = element.GetValueUint32();
                 break;
 
             case HIDElementType::HID_UNIT_EXPONENT:
@@ -209,6 +213,13 @@ std::vector<HIDReport> HIDReportDescriptorUsages::parse(const HIDReportDescripto
 
                 for (HIDUsage &usage : current_usages)
                 {
+                        //Fix bug on few controllers, that provide incorrect "Unsigned" values
+                    if (current_property.logical_max < current_property.logical_min)
+                        current_property.logical_max = (int32_t)current_property.logical_max_unsigned;
+
+                    if (current_property.physical_max < current_property.physical_min)
+                        current_property.physical_max = (int32_t)current_property.physical_max_unsigned;
+
                     usage.io_type = io_type;
                     usage.property = current_property;
                 }

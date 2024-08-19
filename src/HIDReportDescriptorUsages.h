@@ -47,14 +47,22 @@ class HIDProperty
 {
 public:
     HIDProperty(uint32_t size=0, uint32_t count=0);
-    ~HIDProperty();
+    virtual ~HIDProperty();
 
-    bool is_valid();
+    virtual bool is_valid();
 
-    uint32_t logical_min;
-    uint32_t logical_max;
-    uint32_t physical_min;
-    uint32_t physical_max;
+    int32_t logical_min;
+    uint32_t logical_min_unsigned;
+
+    int32_t logical_max;
+    uint32_t logical_max_unsigned;
+
+    int32_t physical_min;
+    uint32_t physical_min_unsigned;
+
+    int32_t physical_max;
+    uint32_t physical_max_unsigned;
+
     uint32_t unit;
     uint32_t unit_exponent;
     uint32_t size; //Size of the data in bits
