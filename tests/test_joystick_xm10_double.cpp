@@ -128,6 +128,7 @@ TEST(HID, test_input_parsing_button1)
 	
 	GTEST_ASSERT_EQ(joystick.parseData(data, sizeof(data), &joystick_data), true);
 
+	GTEST_ASSERT_EQ(joystick_data.index, 0);
 	GTEST_ASSERT_EQ(joystick_data.buttons[1], 1);
 }
 
@@ -140,6 +141,7 @@ TEST(HID, test_input_parsing_button9)
 	
 	GTEST_ASSERT_EQ(joystick.parseData(data, sizeof(data), &joystick_data), true);
 
+	GTEST_ASSERT_EQ(joystick_data.index, 0);
 	GTEST_ASSERT_EQ(joystick_data.buttons[9], 1);
 }
 

@@ -107,3 +107,18 @@ TEST(PS1, test_input_parsing_neutral)
 	GTEST_ASSERT_EQ(joystick.parseData(data, sizeof(data), &joystick_data), true);
 	GTEST_ASSERT_EQ(joystick_data.X, -129);
 }
+
+TEST(PS1, test_input_index)
+{
+	uint8_t data[] = {	
+		0x02, 0x7f, 0x7f, 0x7f, 0x7f, 0x0f, 0x00, 0x00
+		};
+
+	HIDJoystick joystick(std::make_shared<HIDReportDescriptor>(report_data, (uint16_t)sizeof(report_data)));
+	HIDJoystickData joystick_data;
+	
+		//We should not be able to parse the data because reportID 1 is not present in report_data
+	GTEST_ASSERT_EQ(joystick.parseData(data, sizeof(data), &joystick_data), true);
+	GTEST_ASSERT_EQ(joystick_data.index, 0);
+}
+

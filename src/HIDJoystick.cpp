@@ -73,6 +73,7 @@ uint8_t HIDJoystick::getCount()
 bool HIDJoystick::parseData(uint8_t *data, uint16_t datalen, HIDJoystickData *joystick_data)
 {
     bool found = false;
+    uint8_t joystick_count = 0;
 
     for (uint32_t i = 0; i < this->m_reports.size(); i++)
     {
@@ -80,6 +81,8 @@ bool HIDJoystick::parseData(uint8_t *data, uint16_t datalen, HIDJoystickData *jo
 
         if (report.report_type != HIDIOReportType::Joystick && report.report_type != HIDIOReportType::GamePad)
             continue;
+
+        joystick_count += 1;
 
         for (auto ioblock : report.inputs)
         {
@@ -100,7 +103,7 @@ bool HIDJoystick::parseData(uint8_t *data, uint16_t datalen, HIDJoystickData *jo
                 }
 
                 found = true;
-                joystick_data->index = i;
+                joystick_data->index = joystick_count - 1;
 
                 if (input.type == HIDIOType::Button)
                 {
