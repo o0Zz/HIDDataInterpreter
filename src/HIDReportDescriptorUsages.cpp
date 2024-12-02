@@ -201,7 +201,6 @@ std::vector<HIDReport> HIDReportDescriptorUsages::parse(const HIDReportDescripto
             {
                 if (current_usages.size() == 0)
                     current_usages.push_back(HIDUsage(HIDUsageType::Padding));
-                current_property.count /= (uint32_t)current_usages.size();
 
                 HIDUsageIOType io_type = HIDUsageIOType::None;
                 if (element.GetType() == HIDElementType::HID_INPUT)
@@ -222,6 +221,7 @@ std::vector<HIDReport> HIDReportDescriptorUsages::parse(const HIDReportDescripto
 
                     usage.io_type = io_type;
                     usage.property = current_property;
+                    usage.property.count = (current_property.count / (uint32_t)current_usages.size());
                 }
 
                 if (current_report_id != 0)
