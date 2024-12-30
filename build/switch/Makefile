@@ -85,7 +85,7 @@ export INCLUDE	:=	$(foreach dir,$(INCLUDES),-I$(CURDIR)/$(dir)) \
 .PHONY: clean all
 
 #---------------------------------------------------------------------------------
-all: lib/libhiddatainterpreter.a lib/libhiddatainterpreter.a
+all: lib/libhiddatainterpreter.a lib/libhiddatainterpreterd.a
 
 
 lib:
