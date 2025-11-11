@@ -18,6 +18,8 @@ enum class HIDIOType
     Rz,
     Slider,
     Dial,
+    Brake,
+    Accelerator,
     HatSwitch,
     Wheel
 };

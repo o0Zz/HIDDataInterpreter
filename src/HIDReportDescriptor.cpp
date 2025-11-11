@@ -62,6 +62,14 @@ HIDInputOutput::HIDInputOutput(const HIDUsage &usage, uint32_t idx) : type(HIDIO
         else if (usage.sub_type == (uint32_t)HIDUsageGenericDesktopSubType::Wheel)
             this->type = HIDIOType::Wheel;
     }
+    else if (usage.type == HIDUsageType::Simulation)
+    {
+        if (usage.sub_type == (uint32_t)HIDUsageSimulationSubType::Brake)
+            this->type = HIDIOType::Brake;
+        else if (usage.sub_type == (uint32_t)HIDUsageSimulationSubType::Accelerator)
+            this->type = HIDIOType::Accelerator;
+    }
+    
     else if (usage.type == HIDUsageType::Button)
         this->type = HIDIOType::Button;
     else if (usage.type == HIDUsageType::ReportId)

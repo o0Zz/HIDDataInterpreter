@@ -16,6 +16,7 @@ enum class HIDUsageType
     Padding,
     Button,
     GenericDesktop,
+    Simulation,
     VendorDefined
 };
 
@@ -41,6 +42,12 @@ enum class HIDUsageGenericDesktopSubType
     Dial        = 0x37,
     Wheel       = 0x38,
     HatSwitch   = 0x39,
+};
+
+enum class HIDUsageSimulationSubType
+{
+    Brake       = 0xC5,
+    Accelerator = 0xC4
 };
 
 class HIDProperty

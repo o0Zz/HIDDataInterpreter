@@ -16,15 +16,17 @@ enum class HIDJoystickHatSwitch
     NEUTRAL = 8
 };
 
-#define JOYSTICK_SUPPORT_X         0x0001
-#define JOYSTICK_SUPPORT_Y         0x0002
-#define JOYSTICK_SUPPORT_Z         0x0004
-#define JOYSTICK_SUPPORT_Rx        0x0008
-#define JOYSTICK_SUPPORT_Ry        0x0010
-#define JOYSTICK_SUPPORT_Rz        0x0020
-#define JOYSTICK_SUPPORT_Slider    0x0040
-#define JOYSTICK_SUPPORT_Dial      0x0080
-#define JOYSTICK_SUPPORT_HatSwitch 0x0100
+#define JOYSTICK_SUPPORT_X           0x0001
+#define JOYSTICK_SUPPORT_Y           0x0002
+#define JOYSTICK_SUPPORT_Z           0x0004
+#define JOYSTICK_SUPPORT_Rx          0x0008
+#define JOYSTICK_SUPPORT_Ry          0x0010
+#define JOYSTICK_SUPPORT_Rz          0x0020
+#define JOYSTICK_SUPPORT_Slider      0x0040
+#define JOYSTICK_SUPPORT_Dial        0x0080
+#define JOYSTICK_SUPPORT_Brake       0x0100
+#define JOYSTICK_SUPPORT_Accelerator 0x0200
+#define JOYSTICK_SUPPORT_HatSwitch   0x0400
 
 class HIDJoystickData
 {
@@ -44,6 +46,8 @@ public:
     int16_t Rz; //-32768 to 32767
     int16_t Slider; //-32768 to 32767
     int16_t Dial; //-32768 to 32767
+    int16_t Brake; //-32768 to 32767
+    int16_t Accelerator; //-32768 to 32767
 
     HIDJoystickHatSwitch hat_switch;
 

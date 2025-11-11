@@ -110,6 +110,8 @@ HIDUsageType convert_usage_page(uint32_t usage_page)
             return HIDUsageType::Button;
         case USAGE_PAGE_GenericDesktop:
             return HIDUsageType::GenericDesktop;
+        case USAGE_PAGE_Simulation:
+            return HIDUsageType::Simulation;
         case USAGE_PAGE_VendorDefined:
             return HIDUsageType::VendorDefined;
         default:

@@ -21,6 +21,8 @@ HIDJoystickData::HIDJoystickData() : index(0xFF),
                                      Rz(0),
                                      Slider(0),
                                      Dial(0),
+                                     Brake(0),
+                                     Accelerator(0),
                                      hat_switch(HIDJoystickHatSwitch::NEUTRAL),
                                      button_count(0)
 {
@@ -158,6 +160,16 @@ bool HIDJoystick::parseData(uint8_t *data, uint16_t datalen, HIDJoystickData *jo
                 {
                     joystick_data->support |= JOYSTICK_SUPPORT_HatSwitch;
                     joystick_data->hat_switch = (HIDJoystickHatSwitch)value;
+                }
+                else if (input.type == HIDIOType::Brake)
+                {
+                    joystick_data->support |= JOYSTICK_SUPPORT_Brake;
+                    joystick_data->Brake = mapValue(value, input.logical_min, input.logical_max, -32768, 32767);
+                }
+                else if (input.type == HIDIOType::Accelerator)
+                {
+                    joystick_data->support |= JOYSTICK_SUPPORT_Accelerator;
+                    joystick_data->Accelerator = mapValue(value, input.logical_min, input.logical_max, -32768, 32767);
                 }
             }
 
