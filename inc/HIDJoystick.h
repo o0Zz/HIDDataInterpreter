@@ -1,5 +1,6 @@
 #include "HIDReportDescriptor.h"
 #include <memory>
+#include <map>
 
 #define MAX_BUTTONS 32
 
@@ -53,6 +54,8 @@ public:
 
     uint8_t button_count;
     uint8_t buttons[MAX_BUTTONS];
+
+    std::map<HIDIOConsumerType, uint8_t> consumer_buttons;
 };
 
 class HIDJoystick

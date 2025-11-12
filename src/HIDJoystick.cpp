@@ -116,6 +116,10 @@ bool HIDJoystick::parseData(uint8_t *data, uint16_t datalen, HIDJoystickData *jo
                     if (joystick_data->button_count < input.id)
                         joystick_data->button_count = input.id;
                 }
+                if (input.type == HIDIOType::Consumer)
+                {
+                    joystick_data->consumer_buttons[static_cast<HIDIOConsumerType>(input.id)] = value;
+                }
                 else if (input.type == HIDIOType::X)
                 {
                     joystick_data->support |= JOYSTICK_SUPPORT_X;

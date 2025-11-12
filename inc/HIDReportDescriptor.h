@@ -10,6 +10,7 @@ enum class HIDIOType
     VendorDefined,
     Padding,
     Button,
+    Consumer,
     X,
     Y,
     Z,
@@ -62,6 +63,20 @@ typedef enum class HIDIOReportType
 
     MAX = 0x2F
 } HIDIOReportType;
+
+
+//https://usb.org/sites/default/files/hut1_2.pdf p118
+enum class HIDIOConsumerType
+{
+    Menu = 0x40,
+    RedMenuButton = 0x69,
+    GreenMenuButton = 0x6A,
+    BlueMenuButton = 0x6B,
+    YellowMenuButton = 0x6C,
+    VolumeIncrement = 0xE9,
+    VolumeDecrement = 0xEA,
+    PlayPause = 0xCD
+};
 
 class HIDIOBlock
 {

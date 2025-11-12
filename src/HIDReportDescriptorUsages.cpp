@@ -21,28 +21,6 @@
 #define USAGE_PAGE_Consumer       0x0C
 #define USAGE_PAGE_VendorDefined  0xFF00
 
-//---------------USAGE-----------------
-#define USAGE_X          0x30
-#define USAGE_Y          0x31
-#define USAGE_Z          0x32
-#define USAGE_Rx         0x33
-#define USAGE_Ry         0x34
-#define USAGE_Rz         0x35
-#define USAGE_Slider     0x36
-#define USAGE_Dial       0x37
-#define USAGE_Wheel      0x38
-#define USAGE_Hat_switch 0x39
-
-//---------------INPUT-----------------
-#define INPUT_Const 0x01
-#define INPUT_Var   0x02
-#define INPUT_Rel   0x04
-#define INPUT_Wrap  0x08
-#define INPUT_NLin  0x10
-#define INPUT_NPrf  0x20
-#define INPUT_Null  0x40
-#define INPUT_Vol   0x80
-
 //---------------COLLECTION-----------------
 #define HID_COLLECTION_PHYSICAL       0x00
 #define HID_COLLECTION_APPLICATION    0x01
@@ -114,6 +92,8 @@ HIDUsageType convert_usage_page(uint32_t usage_page)
             return HIDUsageType::Simulation;
         case USAGE_PAGE_VendorDefined:
             return HIDUsageType::VendorDefined;
+        case USAGE_PAGE_Consumer:
+            return HIDUsageType::Consumer;
         default:
             return HIDUsageType::Unknown;
     }

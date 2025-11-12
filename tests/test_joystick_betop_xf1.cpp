@@ -173,6 +173,7 @@ TEST(BETOP, test_joystick_right_joystick)
 {
 	uint8_t data[] = {	0x03, 0x00, 0x0F, 0x00, 0x40, 0x80, 0x80, 0xD6, 0x21, 0x00, 0x00};
 	//uint8_t data[] = {	0x03, 0x00, 0x0F, 0x00, 0x00, 0x80, 0x80, 0x7C, 0xFF, 0x00, 0x00 };
+	
 	HIDJoystick joystick(std::make_shared<HIDReportDescriptor>(report_data, (uint16_t)sizeof(report_data)));
 	HIDJoystickData joystick_data;
 	
@@ -181,3 +182,14 @@ TEST(BETOP, test_joystick_right_joystick)
 	GTEST_ASSERT_EQ(joystick_data.Z, 22230);
 }
 
+TEST(BETOP, test_joystick_consumer_button)
+{
+	uint8_t data[] = {	0x03, 0x00, 0x0F, 0x00, 0x80, 0x80, 0x80, 0x80, 0x80, 0x00, 0x00 };
+	
+	HIDJoystick joystick(std::make_shared<HIDReportDescriptor>(report_data, (uint16_t)sizeof(report_data)));
+	HIDJoystickData joystick_data;
+	
+	GTEST_ASSERT_EQ(joystick.parseData(data, sizeof(data), &joystick_data), true);
+	
+	GTEST_ASSERT_EQ(joystick_data.consumer_buttons[HIDIOConsumerType::Menu], 0);
+}

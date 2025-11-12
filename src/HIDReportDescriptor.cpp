@@ -76,6 +76,8 @@ HIDInputOutput::HIDInputOutput(const HIDUsage &usage, uint32_t idx) : type(HIDIO
         this->type = HIDIOType::ReportId;
     else if (usage.type == HIDUsageType::Padding)
         this->type = HIDIOType::Padding;
+    else if (usage.type == HIDUsageType::Consumer)
+        this->type = HIDIOType::Consumer;
     else if (usage.type == HIDUsageType::VendorDefined)
     {
         this->type = HIDIOType::VendorDefined;

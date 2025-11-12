@@ -17,9 +17,11 @@ enum class HIDUsageType
     Button,
     GenericDesktop,
     Simulation,
-    VendorDefined
+    VendorDefined,
+    Consumer
 };
 
+//https://usb.org/sites/default/files/hut1_2.pdf p30
 enum class HIDUsageGenericDesktopSubType 
 {
     Pointer = 0x01,
