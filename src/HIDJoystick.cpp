@@ -113,8 +113,8 @@ bool HIDJoystick::parseData(uint8_t *data, uint16_t datalen, HIDJoystickData *jo
                         return false;
 
                     joystick_data->buttons[input.id] = value;
-                    if (joystick_data->button_count < input.id)
-                        joystick_data->button_count = input.id;
+                    if (joystick_data->button_count <= input.id)
+                        joystick_data->button_count = input.id + 1;
                 }
                 if (input.type == HIDIOType::Consumer)
                 {
