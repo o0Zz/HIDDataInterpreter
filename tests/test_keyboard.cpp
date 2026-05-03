@@ -69,8 +69,8 @@ TEST(KEYBOARD, test_keyboard_parse_keys)
 	uint8_t data[] = {0x00, 0x00, 0x04, 0x05, 0x00, 0x00, 0x00, 0x00};
 	GTEST_ASSERT_EQ(keyboard.parse_data(data, sizeof(data), &keyboard_data), true);
 	GTEST_ASSERT_EQ(keyboard_data.key_count, 2);
-	GTEST_ASSERT_EQ(keyboard_data.keys[0], 0x04); // 'a'
-	GTEST_ASSERT_EQ(keyboard_data.keys[1], 0x05); // 'b'
+	GTEST_ASSERT_EQ(keyboard_data.keys[0], HIDKeyboardKey::A);
+	GTEST_ASSERT_EQ(keyboard_data.keys[1], HIDKeyboardKey::B);
 }
 
 TEST(KEYBOARD, test_keyboard_parse_modifiers_and_keys)
@@ -84,5 +84,5 @@ TEST(KEYBOARD, test_keyboard_parse_modifiers_and_keys)
 	GTEST_ASSERT_EQ(keyboard.parse_data(data, sizeof(data), &keyboard_data), true);
 	GTEST_ASSERT_EQ(keyboard_data.modifiers & KEYBOARD_MODIFIER_LEFT_SHIFT, KEYBOARD_MODIFIER_LEFT_SHIFT);
 	GTEST_ASSERT_EQ(keyboard_data.key_count, 1);
-	GTEST_ASSERT_EQ(keyboard_data.keys[0], 0x04); // 'a'
+	GTEST_ASSERT_EQ(keyboard_data.keys[0], HIDKeyboardKey::A);
 }

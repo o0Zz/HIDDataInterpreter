@@ -99,7 +99,7 @@ bool HIDKeyboard::parse_data(uint8_t *data, uint16_t datalen, HIDKeyboardData *k
                     {
                         if (key_index < MAX_KEYBOARD_KEYS)
                         {
-                            keyboard_data->keys[key_index] = (uint8_t)value;
+                            keyboard_data->keys[key_index] = static_cast<HIDKeyboardKey>(value);
                             key_index++;
                             keyboard_data->key_count = key_index;
                         }
