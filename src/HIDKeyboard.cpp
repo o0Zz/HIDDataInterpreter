@@ -42,7 +42,7 @@ uint8_t HIDKeyboard::get_count()
 {
     uint8_t count = 0;
 
-    for (auto report : this->m_reports)
+    for (const auto &report : this->m_reports)
     {
         if (report.report_type == HIDIOReportType::Keyboard || report.report_type == HIDIOReportType::Keypad)
             count++;
@@ -56,26 +56,26 @@ uint8_t HIDKeyboard::get_count()
 bool HIDKeyboard::parse_data(uint8_t *data, uint16_t datalen, HIDKeyboardData *keyboard_data)
 {
     bool found = false;
+    const uint32_t total_bits = static_cast<uint32_t>(datalen) * 8;
 
     for (uint32_t i = 0; i < this->m_reports.size(); i++)
     {
-        auto report = this->m_reports[i];
+        const auto &report = this->m_reports[i];
 
         if (report.report_type != HIDIOReportType::Keyboard && report.report_type != HIDIOReportType::Keypad)
             continue;
 
-        for (auto ioblock : report.inputs)
+        for (const auto &ioblock : report.inputs)
         {
             uint32_t bit_offset = 0;
-            uint8_t modifier_index = 0;
             uint8_t key_index = 0;
 
-            for (auto input : ioblock.data)
+            for (const auto &input : ioblock.data)
             {
                 uint32_t value = HIDUtils::read_bits_le(data, bit_offset, input.size);
                 bit_offset += input.size;
 
-                if (bit_offset > (datalen * (uint32_t)8))
+                if (bit_offset > total_bits)
                     return false; // Out of range
 
                 if (input.type == HIDIOType::ReportId)

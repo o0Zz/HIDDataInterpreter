@@ -45,7 +45,7 @@ uint8_t HIDMouse::get_count()
 {
     uint8_t count = 0;
 
-    for (auto report : this->m_reports)
+    for (const auto &report : this->m_reports)
     {
         if (report.report_type == HIDIOReportType::Mouse || report.report_type == HIDIOReportType::Pointer)
             count++;
@@ -73,24 +73,25 @@ static int32_t sign_extend(uint32_t value, uint32_t bits)
 bool HIDMouse::parse_data(uint8_t *data, uint16_t datalen, HIDMouseData *mouse_data)
 {
     bool found = false;
+    const uint32_t total_bits = static_cast<uint32_t>(datalen) * 8;
 
     for (uint32_t i = 0; i < this->m_reports.size(); i++)
     {
-        auto report = this->m_reports[i];
+        const auto &report = this->m_reports[i];
 
         if (report.report_type != HIDIOReportType::Mouse && report.report_type != HIDIOReportType::Pointer)
             continue;
 
-        for (auto ioblock : report.inputs)
+        for (const auto &ioblock : report.inputs)
         {
             uint32_t bit_offset = 0;
 
-            for (auto input : ioblock.data)
+            for (const auto &input : ioblock.data)
             {
                 uint32_t value = HIDUtils::read_bits_le(data, bit_offset, input.size);
                 bit_offset += input.size;
 
-                if (bit_offset > (datalen * (uint32_t)8))
+                if (bit_offset > total_bits)
                     return false; // Out of range
 
                 if (input.type == HIDIOType::ReportId)
@@ -101,29 +102,29 @@ bool HIDMouse::parse_data(uint8_t *data, uint16_t datalen, HIDMouseData *mouse_d
 
                 found = true;
 
-                if (input.type == HIDIOType::Button)
+                switch (input.type)
                 {
+                case HIDIOType::Button:
                     if (input.id >= MAX_MOUSE_BUTTONS)
-                        continue;
-
+                        break;
                     mouse_data->buttons[input.id] = value;
                     if (mouse_data->button_count <= input.id)
                         mouse_data->button_count = input.id + 1;
-                }
-                else if (input.type == HIDIOType::X)
-                {
+                    break;
+                case HIDIOType::X:
                     mouse_data->support |= MOUSE_SUPPORT_X;
                     mouse_data->x = (int16_t)sign_extend(value, input.size);
-                }
-                else if (input.type == HIDIOType::Y)
-                {
+                    break;
+                case HIDIOType::Y:
                     mouse_data->support |= MOUSE_SUPPORT_Y;
                     mouse_data->y = (int16_t)sign_extend(value, input.size);
-                }
-                else if (input.type == HIDIOType::Wheel)
-                {
+                    break;
+                case HIDIOType::Wheel:
                     mouse_data->support |= MOUSE_SUPPORT_WHEEL;
                     mouse_data->wheel = (int16_t)sign_extend(value, input.size);
+                    break;
+                default:
+                    break;
                 }
             }
 
