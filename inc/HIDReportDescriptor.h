@@ -65,6 +65,15 @@ typedef enum class HIDIOReportType
     MAX = 0x2F
 } HIDIOReportType;
 
+#define HID_DEVICE_POINTER   0x0001
+#define HID_DEVICE_MOUSE     0x0002
+#define HID_DEVICE_JOYSTICK  0x0004
+#define HID_DEVICE_GAMEPAD   0x0008
+#define HID_DEVICE_KEYBOARD  0x0010
+#define HID_DEVICE_KEYPAD    0x0020
+#define HID_DEVICE_MULTIAXIS 0x0040
+#define HID_DEVICE_TABLET    0x0080
+
 
 //https://usb.org/sites/default/files/hut1_2.pdf p118
 enum class HIDIOConsumerType
@@ -110,7 +119,8 @@ public:
     HIDReportDescriptor(const uint8_t *hid_report_data, uint16_t hid_report_data_size);
     ~HIDReportDescriptor();
 
-    std::vector<HIDIOReport> GetReports() const { return m_reports; }
+    std::vector<HIDIOReport> get_reports() const { return m_reports; }
+    uint16_t get_device_types() const;
     
 private:
     void parse(const uint8_t *hid_report_data, uint16_t hid_report_data_len);

@@ -39,9 +39,9 @@ Tests cover real controllers including PS4, Xbox 360, Google Stadia, PS1 adapter
 The library uses a layered pipeline — each layer can be used independently:
 
 ```
-Raw HID Descriptor bytes
-         │
-         ▼
+    Raw HID Descriptor bytes
+               │
+               ▼
 ┌─────────────────────────────┐
 │ HIDReportDescriptorElements │  Parses raw bytes into key/value elements
 └──────────────┬──────────────┘
@@ -65,83 +65,83 @@ Raw HID Descriptor bytes
 
 ## Usage
 
-### Joystick
-
 ```cpp
+#include <cstdio>
+#include <memory>
+#include <libusb-1.0/libusb.h>
 #include "HIDReportDescriptor.h"
 #include "HIDJoystick.h"
-
-// Parse the HID report descriptor (obtained from the device)
-uint8_t hid_report_data[1024];
-uint16_t report_size = /* read descriptor from USB device */;
-
-auto report_desc = std::make_shared<HIDReportDescriptor>(hid_report_data, report_size);
-HIDJoystick joystick(report_desc);
-
-if (joystick.is_valid())
-{
-    HIDJoystickData joystick_data;
-    uint8_t usb_data[64]; // raw USB interrupt transfer data
-
-    if (joystick.parse_data(usb_data, sizeof(usb_data), &joystick_data))
-    {
-        // Access normalized axis values (-32768 to 32767)
-        int16_t x = joystick_data.x;
-        int16_t y = joystick_data.y;
-
-        // Access buttons 
-        uint8_t btn1 = joystick_data.buttons[1];
-
-        // Check hat switch
-        HIDJoystickHatSwitch hat = joystick_data.hat_switch;
-    }
-}
-```
-
-### Mouse
-
-```cpp
-#include "HIDReportDescriptor.h"
 #include "HIDMouse.h"
-
-auto report_desc = std::make_shared<HIDReportDescriptor>(hid_report_data, report_size);
-HIDMouse mouse(report_desc);
-
-if (mouse.is_valid())
-{
-    HIDMouseData mouse_data;
-
-    if (mouse.parse_data(usb_data, sizeof(usb_data), &mouse_data))
-    {
-        int16_t dx = mouse_data.x;      // relative X movement
-        int16_t dy = mouse_data.y;      // relative Y movement
-        int16_t wheel = mouse_data.wheel; // scroll wheel delta
-        uint8_t left_btn = mouse_data.buttons[0];
-    }
-}
-```
-
-### Keyboard
-
-```cpp
-#include "HIDReportDescriptor.h"
 #include "HIDKeyboard.h"
 
-auto report_desc = std::make_shared<HIDReportDescriptor>(hid_report_data, report_size);
-HIDKeyboard keyboard(report_desc);
-
-if (keyboard.is_valid())
+int main()
 {
-    HIDKeyboardData keyboard_data;
+    libusb_context *ctx = NULL;
+    libusb_device_handle *handle = NULL;
+    uint8_t usb_data[64];
+    uint8_t hid_report_data[1024];
+    int transferred = 0;
+    int interface_num = 0;
 
-    if (keyboard.parse_data(usb_data, sizeof(usb_data), &keyboard_data))
+    libusb_init(&ctx);
+
+    // Open your USB device (vendor_id, product_id)
+    handle = libusb_open_device_with_vid_pid(ctx, 0x054C, 0x09CC); // e.g. PS4 controller
+    if (!handle)
+        return -1;
+
+    libusb_claim_interface(handle, 0);
+
+    // Get HID report descriptor
+    int report_size = libusb_control_transfer(handle, LIBUSB_ENDPOINT_IN | LIBUSB_RECIPIENT_INTERFACE, LIBUSB_REQUEST_GET_DESCRIPTOR, (LIBUSB_DT_REPORT << 8) | interface_num, interface_num, hid_report_data, sizeof(hid_report_data, 5000);
+
+    if (report_size < 0)
+        return -1;
+
+    // Parse the HID report descriptor
+    auto report_desc = std::make_shared<HIDReportDescriptor>(hid_report_data, (uint16_t)report_size);
+
+    // Read raw USB interrupt data
+    libusb_interrupt_transfer(handle, 0x81 /*Typically first IN endpoint*/, usb_data, sizeof(usb_data), &transferred, 5000);
+
+    uint16_t types = report_desc->get_device_types();
+    if (types & (HID_DEVICE_JOYSTICK | HID_DEVICE_GAMEPAD))
     {
-        uint8_t mods = keyboard_data.modifiers; // KEYBOARD_MODIFIER_* bitmask
-        for (int i = 0; i < keyboard_data.key_count; i++)
+        HIDJoystick joystick(report_desc);
+        HIDJoystickData data;
+
+        if (joystick.parse_data(usb_data, (uint16_t)transferred, &data))
         {
-            uint8_t scancode = keyboard_data.keys[i]; // USB HID scan code
+            printf("Joystick: X=%d Y=%d btn0=%d\n", data.x, data.y, data.buttons[0]);
         }
     }
+
+    if (types & HID_DEVICE_MOUSE)
+    {
+        HIDMouse mouse(report_desc);
+        HIDMouseData data;
+
+        if (mouse.parse_data(usb_data, (uint16_t)transferred, &data))
+        {
+            printf("Mouse: dX=%d dY=%d wheel=%d\n", data.x, data.y, data.wheel);
+        }
+    }
+
+    if (types & HID_DEVICE_KEYBOARD)
+    {
+        HIDKeyboard keyboard(report_desc);
+        HIDKeyboardData data;
+
+        if (keyboard.parse_data(usb_data, (uint16_t)transferred, &data))
+        {
+            printf("Keyboard: mods=0x%02X keys=%d\n", data.modifiers, data.key_count);
+        }
+    }
+
+    libusb_release_interface(handle, 0);
+    libusb_close(handle);
+    libusb_exit(ctx);
+    return 0;
 }
 ```
 

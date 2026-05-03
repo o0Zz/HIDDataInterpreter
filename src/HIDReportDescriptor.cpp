@@ -151,3 +151,28 @@ void HIDReportDescriptor::parse(const uint8_t *hid_report_data, uint16_t hid_rep
 
     assert(m_reports.size() > 0);
 }
+
+/* -------------------------------------------------------------------- */
+
+uint16_t HIDReportDescriptor::get_device_types() const
+{
+    uint16_t types = 0;
+
+    for (size_t i = 0; i < m_reports.size(); i++)
+    {
+        switch (m_reports[i].report_type)
+        {
+            case HIDIOReportType::Pointer:  types |= HID_DEVICE_POINTER;  break;
+            case HIDIOReportType::Mouse:    types |= HID_DEVICE_MOUSE;    break;
+            case HIDIOReportType::Joystick: types |= HID_DEVICE_JOYSTICK; break;
+            case HIDIOReportType::GamePad:  types |= HID_DEVICE_GAMEPAD;  break;
+            case HIDIOReportType::Keyboard: types |= HID_DEVICE_KEYBOARD; break;
+            case HIDIOReportType::Keypad:   types |= HID_DEVICE_KEYPAD;   break;
+            case HIDIOReportType::MultiAxis:types |= HID_DEVICE_MULTIAXIS;break;
+            case HIDIOReportType::Tablet:   types |= HID_DEVICE_TABLET;   break;
+            default: break;
+        }
+    }
+
+    return types;
+}
