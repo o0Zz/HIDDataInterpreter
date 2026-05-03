@@ -98,18 +98,18 @@ const uint8_t report_data[] = {
 TEST(GoogleStadia, test_report_has_1_gamepad)
 {
 	HIDReportDescriptor hid_report_descriptor(report_data, (uint16_t)sizeof(report_data));
-	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports().size(), 1);
-	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].report_type, HIDIOReportType::GamePad);
+	GTEST_ASSERT_EQ(hid_report_descriptor.get_reports().size(), 1);
+	GTEST_ASSERT_EQ(hid_report_descriptor.get_reports()[0].report_type, HIDIOReportType::GamePad);
 }
 
 TEST(GoogleStadia, test_report_correct_inputs)
 {
 	HIDReportDescriptor hid_report_descriptor(report_data, (uint16_t)sizeof(report_data));
-	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].inputs[0].data.size(), 36);
-	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].inputs[0].data[0].type, HIDIOType::ReportId);
+	GTEST_ASSERT_EQ(hid_report_descriptor.get_reports()[0].inputs[0].data.size(), 36);
+	GTEST_ASSERT_EQ(hid_report_descriptor.get_reports()[0].inputs[0].data[0].type, HIDIOType::ReportId);
 	//...
-	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].inputs[0].data[26].type, HIDIOType::Brake);
-	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].inputs[0].data[27].type, HIDIOType::Accelerator);
+	GTEST_ASSERT_EQ(hid_report_descriptor.get_reports()[0].inputs[0].data[26].type, HIDIOType::Brake);
+	GTEST_ASSERT_EQ(hid_report_descriptor.get_reports()[0].inputs[0].data[27].type, HIDIOType::Accelerator);
 }
 
 TEST(GoogleStadia, test_input_parsing_accelerator)

@@ -60,24 +60,24 @@ const uint8_t report_data[] = {
 TEST(TRUSTMASTER, test_report_has_1_gamepad)
 {
 	HIDReportDescriptor hid_report_descriptor(report_data, (uint16_t)sizeof(report_data));
-	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports().size(), 1);
-	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].report_type, HIDIOReportType::GamePad);
+	GTEST_ASSERT_EQ(hid_report_descriptor.get_reports().size(), 1);
+	GTEST_ASSERT_EQ(hid_report_descriptor.get_reports()[0].report_type, HIDIOReportType::GamePad);
 }
 
 TEST(TRUSTMASTER, test_report_correct_inputs)
 {
 	HIDReportDescriptor hid_report_descriptor(report_data, (uint16_t)sizeof(report_data));
-	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].inputs[0].data.size(), 18);
-	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].inputs[0].data[0].type, HIDIOType::Button);
-	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].inputs[0].data[1].type, HIDIOType::Button);
-	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].inputs[0].data[2].type, HIDIOType::Button);
-	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].inputs[0].data[3].type, HIDIOType::Button);
+	GTEST_ASSERT_EQ(hid_report_descriptor.get_reports()[0].inputs[0].data.size(), 18);
+	GTEST_ASSERT_EQ(hid_report_descriptor.get_reports()[0].inputs[0].data[0].type, HIDIOType::Button);
+	GTEST_ASSERT_EQ(hid_report_descriptor.get_reports()[0].inputs[0].data[1].type, HIDIOType::Button);
+	GTEST_ASSERT_EQ(hid_report_descriptor.get_reports()[0].inputs[0].data[2].type, HIDIOType::Button);
+	GTEST_ASSERT_EQ(hid_report_descriptor.get_reports()[0].inputs[0].data[3].type, HIDIOType::Button);
 	//...
-	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].inputs[0].data[13].type, HIDIOType::HatSwitch);
-	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].inputs[0].data[14].type, HIDIOType::X);
-	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].inputs[0].data[15].type, HIDIOType::Y);
-	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].inputs[0].data[16].type, HIDIOType::Rz);
-	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].inputs[0].data[17].type, HIDIOType::Slider);
+	GTEST_ASSERT_EQ(hid_report_descriptor.get_reports()[0].inputs[0].data[13].type, HIDIOType::HatSwitch);
+	GTEST_ASSERT_EQ(hid_report_descriptor.get_reports()[0].inputs[0].data[14].type, HIDIOType::X);
+	GTEST_ASSERT_EQ(hid_report_descriptor.get_reports()[0].inputs[0].data[15].type, HIDIOType::Y);
+	GTEST_ASSERT_EQ(hid_report_descriptor.get_reports()[0].inputs[0].data[16].type, HIDIOType::Rz);
+	GTEST_ASSERT_EQ(hid_report_descriptor.get_reports()[0].inputs[0].data[17].type, HIDIOType::Slider);
 }
 
 TEST(TRUSTMASTER, test_input_parsing_slider)

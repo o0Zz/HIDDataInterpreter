@@ -144,9 +144,9 @@ const uint8_t report_data[] = {
 TEST(BETOP, test_report_has_1_gamepad_and_z_rz)
 {
 	HIDReportDescriptor hid_report_descriptor(report_data, (uint16_t)sizeof(report_data));
-	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports().size(), 3); // Mouse + GamePad + VendorDefined
+	GTEST_ASSERT_EQ(hid_report_descriptor.get_reports().size(), 3); // Mouse + GamePad + VendorDefined
 
-	HIDIOReport report = hid_report_descriptor.GetReports()[1];
+	HIDIOReport report = hid_report_descriptor.get_reports()[1];
 
 	GTEST_ASSERT_EQ(report.report_type, HIDIOReportType::GamePad);
 	GTEST_ASSERT_EQ(report.inputs[0].data.size(), 32);

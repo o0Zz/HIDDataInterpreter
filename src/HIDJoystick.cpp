@@ -39,7 +39,7 @@ HIDJoystickData::~HIDJoystickData()
 
 HIDJoystick::HIDJoystick(const std::shared_ptr<HIDReportDescriptor> &descriptor)
 {
-    this->m_reports = descriptor->GetReports();
+    this->m_reports = descriptor->get_reports();
 }
 
 /* ----------------------------------------------- */

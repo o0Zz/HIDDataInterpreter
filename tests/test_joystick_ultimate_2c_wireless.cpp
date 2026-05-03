@@ -78,7 +78,7 @@ const uint8_t report_data[] = {
 TEST(HEIGHTBITDO, test_report_has_1_gamepad)
 {
 	HIDReportDescriptor hid_report_descriptor(report_data, (uint16_t)sizeof(report_data));
-	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports().size(), 1); // Mouse + GamePad + VendorDefined
+	GTEST_ASSERT_EQ(hid_report_descriptor.get_reports().size(), 1); // Mouse + GamePad + VendorDefined
 }
 
 TEST(HEIGHTBITDO, test_joystick_button_15)

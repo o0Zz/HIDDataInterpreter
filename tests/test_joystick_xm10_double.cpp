@@ -90,33 +90,33 @@ uint8_t report_data[] =
 TEST(HID, test_report_has_2_joystick)
 {
 	HIDReportDescriptor hid_report_descriptor(report_data, (uint16_t)sizeof(report_data));
-	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports().size(), 2);
-	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].report_type, HIDIOReportType::Joystick);
-	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[1].report_type, HIDIOReportType::Joystick);
+	GTEST_ASSERT_EQ(hid_report_descriptor.get_reports().size(), 2);
+	GTEST_ASSERT_EQ(hid_report_descriptor.get_reports()[0].report_type, HIDIOReportType::Joystick);
+	GTEST_ASSERT_EQ(hid_report_descriptor.get_reports()[1].report_type, HIDIOReportType::Joystick);
 }
 
 TEST(HID, test_report_ids_for_joysticks)
 {
 	HIDReportDescriptor hid_report_descriptor(report_data, (uint16_t)sizeof(report_data));
 	
-	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].inputs[0].data[0].type, HIDIOType::ReportId);
-	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].inputs[0].data[0].id, 1);
+	GTEST_ASSERT_EQ(hid_report_descriptor.get_reports()[0].inputs[0].data[0].type, HIDIOType::ReportId);
+	GTEST_ASSERT_EQ(hid_report_descriptor.get_reports()[0].inputs[0].data[0].id, 1);
 
-	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[1].inputs[0].data[0].type, HIDIOType::ReportId);
-	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[1].inputs[0].data[0].id, 2);
+	GTEST_ASSERT_EQ(hid_report_descriptor.get_reports()[1].inputs[0].data[0].type, HIDIOType::ReportId);
+	GTEST_ASSERT_EQ(hid_report_descriptor.get_reports()[1].inputs[0].data[0].id, 2);
 }
 
 TEST(HID, test_report_has_correct_inputs)
 {
 	HIDReportDescriptor hid_report_descriptor(report_data, (uint16_t)sizeof(report_data));
-	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].inputs[0].data.size(), 21);
-	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].inputs[0].data[0].type, HIDIOType::ReportId);
-	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].inputs[0].data[1].type, HIDIOType::X);
-	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].inputs[0].data[2].type, HIDIOType::Y);
-	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].inputs[0].data[3].type, HIDIOType::Button);
-	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].inputs[0].data[18].type, HIDIOType::Padding);
-	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].inputs[0].data[19].type, HIDIOType::HatSwitch);
-	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].inputs[0].data[20].type, HIDIOType::Padding);
+	GTEST_ASSERT_EQ(hid_report_descriptor.get_reports()[0].inputs[0].data.size(), 21);
+	GTEST_ASSERT_EQ(hid_report_descriptor.get_reports()[0].inputs[0].data[0].type, HIDIOType::ReportId);
+	GTEST_ASSERT_EQ(hid_report_descriptor.get_reports()[0].inputs[0].data[1].type, HIDIOType::X);
+	GTEST_ASSERT_EQ(hid_report_descriptor.get_reports()[0].inputs[0].data[2].type, HIDIOType::Y);
+	GTEST_ASSERT_EQ(hid_report_descriptor.get_reports()[0].inputs[0].data[3].type, HIDIOType::Button);
+	GTEST_ASSERT_EQ(hid_report_descriptor.get_reports()[0].inputs[0].data[18].type, HIDIOType::Padding);
+	GTEST_ASSERT_EQ(hid_report_descriptor.get_reports()[0].inputs[0].data[19].type, HIDIOType::HatSwitch);
+	GTEST_ASSERT_EQ(hid_report_descriptor.get_reports()[0].inputs[0].data[20].type, HIDIOType::Padding);
 }
 
 

@@ -32,8 +32,8 @@ const uint8_t keyboard_report_data[] = {
 TEST(KEYBOARD, test_report_has_1_keyboard)
 {
 	HIDReportDescriptor hid_report_descriptor(keyboard_report_data, (uint16_t)sizeof(keyboard_report_data));
-	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports().size(), 1);
-	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].report_type, HIDIOReportType::Keyboard);
+	GTEST_ASSERT_EQ(hid_report_descriptor.get_reports().size(), 1);
+	GTEST_ASSERT_EQ(hid_report_descriptor.get_reports()[0].report_type, HIDIOReportType::Keyboard);
 }
 
 TEST(KEYBOARD, test_keyboard_is_valid)

@@ -20,7 +20,7 @@ HIDKeyboardData::~HIDKeyboardData()
 
 HIDKeyboard::HIDKeyboard(const std::shared_ptr<HIDReportDescriptor> &descriptor)
 {
-    this->m_reports = descriptor->GetReports();
+    this->m_reports = descriptor->get_reports();
 }
 
 /* ----------------------------------------------- */

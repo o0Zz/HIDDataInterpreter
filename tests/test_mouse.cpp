@@ -54,20 +54,20 @@ const uint8_t report_data[] = {
 TEST(MOUSE, test_report_has_1_mouse)
 {
 	HIDReportDescriptor hid_report_descriptor(report_data, (uint16_t)sizeof(report_data));
-	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports().size(), 1);
-	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].report_type, HIDIOReportType::Mouse);
+	GTEST_ASSERT_EQ(hid_report_descriptor.get_reports().size(), 1);
+	GTEST_ASSERT_EQ(hid_report_descriptor.get_reports()[0].report_type, HIDIOReportType::Mouse);
 }
 
 TEST(MOUSE, test_report_correct_inputs)
 {
 	HIDReportDescriptor hid_report_descriptor(report_data, (uint16_t)sizeof(report_data));
-	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].inputs[0].data.size(), 13);
-	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].inputs[0].data[0].type, HIDIOType::Button);
-	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].inputs[0].data[5].type, HIDIOType::Padding);
-	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].inputs[0].data[8].type, HIDIOType::VendorDefined);
-	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].inputs[0].data[10].type, HIDIOType::Wheel);
-	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].inputs[0].data[11].type, HIDIOType::X);
-	GTEST_ASSERT_EQ(hid_report_descriptor.GetReports()[0].inputs[0].data[12].type, HIDIOType::Y);
+	GTEST_ASSERT_EQ(hid_report_descriptor.get_reports()[0].inputs[0].data.size(), 13);
+	GTEST_ASSERT_EQ(hid_report_descriptor.get_reports()[0].inputs[0].data[0].type, HIDIOType::Button);
+	GTEST_ASSERT_EQ(hid_report_descriptor.get_reports()[0].inputs[0].data[5].type, HIDIOType::Padding);
+	GTEST_ASSERT_EQ(hid_report_descriptor.get_reports()[0].inputs[0].data[8].type, HIDIOType::VendorDefined);
+	GTEST_ASSERT_EQ(hid_report_descriptor.get_reports()[0].inputs[0].data[10].type, HIDIOType::Wheel);
+	GTEST_ASSERT_EQ(hid_report_descriptor.get_reports()[0].inputs[0].data[11].type, HIDIOType::X);
+	GTEST_ASSERT_EQ(hid_report_descriptor.get_reports()[0].inputs[0].data[12].type, HIDIOType::Y);
 }
 
 TEST(MOUSE, test_mouse_is_valid)
