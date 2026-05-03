@@ -31,14 +31,14 @@ HIDKeyboard::~HIDKeyboard()
 
 /* ----------------------------------------------- */
 
-bool HIDKeyboard::isValid()
+bool HIDKeyboard::is_valid()
 {
-    return getCount() > 0;
+    return get_count() > 0;
 }
 
 /* ----------------------------------------------- */
 
-uint8_t HIDKeyboard::getCount()
+uint8_t HIDKeyboard::get_count()
 {
     uint8_t count = 0;
 
@@ -53,7 +53,7 @@ uint8_t HIDKeyboard::getCount()
 
 /* ----------------------------------------------- */
 
-bool HIDKeyboard::parseData(uint8_t *data, uint16_t datalen, HIDKeyboardData *keyboard_data)
+bool HIDKeyboard::parse_data(uint8_t *data, uint16_t datalen, HIDKeyboardData *keyboard_data)
 {
     bool found = false;
 
@@ -66,16 +66,16 @@ bool HIDKeyboard::parseData(uint8_t *data, uint16_t datalen, HIDKeyboardData *ke
 
         for (auto ioblock : report.inputs)
         {
-            uint32_t bitOffset = 0;
+            uint32_t bit_offset = 0;
             uint8_t modifier_index = 0;
             uint8_t key_index = 0;
 
             for (auto input : ioblock.data)
             {
-                uint32_t value = HIDUtils::readBitsLE(data, bitOffset, input.size);
-                bitOffset += input.size;
+                uint32_t value = HIDUtils::read_bits_le(data, bit_offset, input.size);
+                bit_offset += input.size;
 
-                if (bitOffset > (datalen * (uint32_t)8))
+                if (bit_offset > (datalen * (uint32_t)8))
                     return false; // Out of range
 
                 if (input.type == HIDIOType::ReportId)

@@ -306,7 +306,7 @@ TEST(PS4, test_input_parsing_button1)
 	HIDJoystick joystick(std::make_shared<HIDReportDescriptor>(report_data, (uint16_t)sizeof(report_data)));
 	HIDJoystickData joystick_data;
 	
-	GTEST_ASSERT_EQ(joystick.parseData(data, sizeof(data), &joystick_data), true);
+	GTEST_ASSERT_EQ(joystick.parse_data(data, sizeof(data), &joystick_data), true);
 
 	GTEST_ASSERT_EQ(joystick_data.buttons[1], 1);
 }
@@ -324,9 +324,9 @@ TEST(PS4, test_input_parsing_left)
 	HIDJoystick joystick(std::make_shared<HIDReportDescriptor>(report_data, (uint16_t)sizeof(report_data)));
 	HIDJoystickData joystick_data;
 	
-	GTEST_ASSERT_EQ(joystick.parseData(data, sizeof(data), &joystick_data), true);
+	GTEST_ASSERT_EQ(joystick.parse_data(data, sizeof(data), &joystick_data), true);
 
-	GTEST_ASSERT_EQ(joystick_data.X, -32768);
+	GTEST_ASSERT_EQ(joystick_data.x, -32768);
 }
 
 TEST(PS4, test_input_parsing_hatswitch_up)
@@ -342,7 +342,7 @@ TEST(PS4, test_input_parsing_hatswitch_up)
 	HIDJoystick joystick(std::make_shared<HIDReportDescriptor>(report_data, (uint16_t)sizeof(report_data)));
 	HIDJoystickData joystick_data;
 	
-	GTEST_ASSERT_EQ(joystick.parseData(data, sizeof(data), &joystick_data), true);
+	GTEST_ASSERT_EQ(joystick.parse_data(data, sizeof(data), &joystick_data), true);
 
 	GTEST_ASSERT_EQ(joystick_data.hat_switch, HIDJoystickHatSwitch::UP);
 }
@@ -360,7 +360,7 @@ TEST(PS4, test_input_parsing_hatswitch_down)
 	HIDJoystick joystick(std::make_shared<HIDReportDescriptor>(report_data, (uint16_t)sizeof(report_data)));
 	HIDJoystickData joystick_data;
 	
-	GTEST_ASSERT_EQ(joystick.parseData(data, sizeof(data), &joystick_data), true);
+	GTEST_ASSERT_EQ(joystick.parse_data(data, sizeof(data), &joystick_data), true);
 
 	GTEST_ASSERT_EQ(joystick_data.hat_switch, HIDJoystickHatSwitch::DOWN);
 }
@@ -378,7 +378,7 @@ TEST(PS4, test_input_parsing_hatswitch_neutral)
 	HIDJoystick joystick(std::make_shared<HIDReportDescriptor>(report_data, (uint16_t)sizeof(report_data)));
 	HIDJoystickData joystick_data;
 	
-	GTEST_ASSERT_EQ(joystick.parseData(data, sizeof(data), &joystick_data), true);
+	GTEST_ASSERT_EQ(joystick.parse_data(data, sizeof(data), &joystick_data), true);
 
 	GTEST_ASSERT_EQ(joystick_data.hat_switch, HIDJoystickHatSwitch::NEUTRAL);
 }

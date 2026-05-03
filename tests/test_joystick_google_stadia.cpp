@@ -121,10 +121,10 @@ TEST(GoogleStadia, test_input_parsing_accelerator)
 	HIDJoystick joystick(std::make_shared<HIDReportDescriptor>(report_data, (uint16_t)sizeof(report_data)));
 	HIDJoystickData joystick_data;
 	
-	GTEST_ASSERT_EQ(joystick.parseData(data, sizeof(data), &joystick_data), true);
+	GTEST_ASSERT_EQ(joystick.parse_data(data, sizeof(data), &joystick_data), true);
 
-	GTEST_ASSERT_EQ(joystick_data.Brake, -32768);
-	GTEST_ASSERT_EQ(joystick_data.Accelerator, 31996);
+	GTEST_ASSERT_EQ(joystick_data.brake, -32768);
+	GTEST_ASSERT_EQ(joystick_data.accelerator, 31996);
 }
 
 TEST(GoogleStadia, test_input_parsing_play_vol)
@@ -136,7 +136,7 @@ TEST(GoogleStadia, test_input_parsing_play_vol)
 	HIDJoystick joystick(std::make_shared<HIDReportDescriptor>(report_data, (uint16_t)sizeof(report_data)));
 	HIDJoystickData joystick_data;
 	
-	GTEST_ASSERT_EQ(joystick.parseData(data, sizeof(data), &joystick_data), true);
+	GTEST_ASSERT_EQ(joystick.parse_data(data, sizeof(data), &joystick_data), true);
 
 	GTEST_ASSERT_EQ(joystick_data.consumer_buttons[HIDIOConsumerType::VolumeIncrement], 1);
 	GTEST_ASSERT_EQ(joystick_data.consumer_buttons[HIDIOConsumerType::VolumeDecrement], 1);

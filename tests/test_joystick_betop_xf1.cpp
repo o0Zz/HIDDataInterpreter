@@ -165,7 +165,7 @@ TEST(BETOP, test_joystick_index)
 	HIDJoystickData joystick_data;
 	
 		//We should not be able to parse the data because reportID 1 is not present in report_data
-	GTEST_ASSERT_EQ(joystick.parseData(data, sizeof(data), &joystick_data), true);
+	GTEST_ASSERT_EQ(joystick.parse_data(data, sizeof(data), &joystick_data), true);
 	GTEST_ASSERT_EQ(joystick_data.index, 0);
 }
 
@@ -177,9 +177,9 @@ TEST(BETOP, test_joystick_right_joystick)
 	HIDJoystick joystick(std::make_shared<HIDReportDescriptor>(report_data, (uint16_t)sizeof(report_data)));
 	HIDJoystickData joystick_data;
 	
-	GTEST_ASSERT_EQ(joystick.parseData(data, sizeof(data), &joystick_data), true);
-	GTEST_ASSERT_EQ(joystick_data.Rz, -24287);
-	GTEST_ASSERT_EQ(joystick_data.Z, 22230);
+	GTEST_ASSERT_EQ(joystick.parse_data(data, sizeof(data), &joystick_data), true);
+	GTEST_ASSERT_EQ(joystick_data.rz, -24287);
+	GTEST_ASSERT_EQ(joystick_data.z, 22230);
 }
 
 TEST(BETOP, test_joystick_consumer_button)
@@ -189,7 +189,7 @@ TEST(BETOP, test_joystick_consumer_button)
 	HIDJoystick joystick(std::make_shared<HIDReportDescriptor>(report_data, (uint16_t)sizeof(report_data)));
 	HIDJoystickData joystick_data;
 	
-	GTEST_ASSERT_EQ(joystick.parseData(data, sizeof(data), &joystick_data), true);
+	GTEST_ASSERT_EQ(joystick.parse_data(data, sizeof(data), &joystick_data), true);
 	
 	GTEST_ASSERT_EQ(joystick_data.consumer_buttons[HIDIOConsumerType::Menu], 0);
 }

@@ -33,10 +33,10 @@ public:
     HIDKeyboard(const std::shared_ptr<HIDReportDescriptor> &descriptor);
     ~HIDKeyboard();
 
-    bool isValid();
-    uint8_t getCount();
+    bool is_valid();
+    uint8_t get_count();
 
-    bool parseData(uint8_t *data, uint16_t datalen, HIDKeyboardData *keyboard_data);
+    bool parse_data(uint8_t *data, uint16_t datalen, HIDKeyboardData *keyboard_data);
 
 private:
     std::vector<HIDIOReport> m_reports;

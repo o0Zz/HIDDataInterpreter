@@ -40,8 +40,8 @@ TEST(KEYBOARD, test_keyboard_is_valid)
 {
 	std::shared_ptr<HIDReportDescriptor> desc = std::make_shared<HIDReportDescriptor>(keyboard_report_data, (uint16_t)sizeof(keyboard_report_data));
 	HIDKeyboard keyboard(desc);
-	GTEST_ASSERT_EQ(keyboard.isValid(), true);
-	GTEST_ASSERT_EQ(keyboard.getCount(), 1);
+	GTEST_ASSERT_EQ(keyboard.is_valid(), true);
+	GTEST_ASSERT_EQ(keyboard.get_count(), 1);
 }
 
 TEST(KEYBOARD, test_keyboard_parse_modifiers)
@@ -53,7 +53,7 @@ TEST(KEYBOARD, test_keyboard_parse_modifiers)
 	// Standard boot protocol: byte 0 = modifiers, byte 1 = reserved, bytes 2-7 = keys
 	// Left Ctrl (bit 0) + Left Shift (bit 1) = 0x03
 	uint8_t data[] = {0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
-	GTEST_ASSERT_EQ(keyboard.parseData(data, sizeof(data), &keyboard_data), true);
+	GTEST_ASSERT_EQ(keyboard.parse_data(data, sizeof(data), &keyboard_data), true);
 	GTEST_ASSERT_EQ(keyboard_data.modifiers & KEYBOARD_MODIFIER_LEFT_CTRL, KEYBOARD_MODIFIER_LEFT_CTRL);
 	GTEST_ASSERT_EQ(keyboard_data.modifiers & KEYBOARD_MODIFIER_LEFT_SHIFT, KEYBOARD_MODIFIER_LEFT_SHIFT);
 	GTEST_ASSERT_EQ(keyboard_data.modifiers & KEYBOARD_MODIFIER_LEFT_ALT, 0);
@@ -67,7 +67,7 @@ TEST(KEYBOARD, test_keyboard_parse_keys)
 
 	// Press 'a' (0x04) and 'b' (0x05)
 	uint8_t data[] = {0x00, 0x00, 0x04, 0x05, 0x00, 0x00, 0x00, 0x00};
-	GTEST_ASSERT_EQ(keyboard.parseData(data, sizeof(data), &keyboard_data), true);
+	GTEST_ASSERT_EQ(keyboard.parse_data(data, sizeof(data), &keyboard_data), true);
 	GTEST_ASSERT_EQ(keyboard_data.key_count, 2);
 	GTEST_ASSERT_EQ(keyboard_data.keys[0], 0x04); // 'a'
 	GTEST_ASSERT_EQ(keyboard_data.keys[1], 0x05); // 'b'
@@ -81,7 +81,7 @@ TEST(KEYBOARD, test_keyboard_parse_modifiers_and_keys)
 
 	// Left Shift + 'a' (Shift+A)
 	uint8_t data[] = {0x02, 0x00, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00};
-	GTEST_ASSERT_EQ(keyboard.parseData(data, sizeof(data), &keyboard_data), true);
+	GTEST_ASSERT_EQ(keyboard.parse_data(data, sizeof(data), &keyboard_data), true);
 	GTEST_ASSERT_EQ(keyboard_data.modifiers & KEYBOARD_MODIFIER_LEFT_SHIFT, KEYBOARD_MODIFIER_LEFT_SHIFT);
 	GTEST_ASSERT_EQ(keyboard_data.key_count, 1);
 	GTEST_ASSERT_EQ(keyboard_data.keys[0], 0x04); // 'a'

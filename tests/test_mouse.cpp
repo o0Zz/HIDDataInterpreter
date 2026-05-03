@@ -74,8 +74,8 @@ TEST(MOUSE, test_mouse_is_valid)
 {
 	std::shared_ptr<HIDReportDescriptor> desc = std::make_shared<HIDReportDescriptor>(report_data, (uint16_t)sizeof(report_data));
 	HIDMouse mouse(desc);
-	GTEST_ASSERT_EQ(mouse.isValid(), true);
-	GTEST_ASSERT_EQ(mouse.getCount(), 1);
+	GTEST_ASSERT_EQ(mouse.is_valid(), true);
+	GTEST_ASSERT_EQ(mouse.get_count(), 1);
 }
 
 TEST(MOUSE, test_mouse_parse_data_buttons)
@@ -88,10 +88,10 @@ TEST(MOUSE, test_mouse_parse_data_buttons)
 	// Byte 0: 5 button bits + 3 padding bits
 	// Byte 1-2: vendor defined (2 bytes)
 	// Byte 3: wheel (1 byte, signed)
-	// Byte 4-5: X (16-bit, signed)
-	// Byte 6-7: Y (16-bit, signed)
+	// Byte 4-5: x (16-bit, signed)
+	// Byte 6-7: y (16-bit, signed)
 	uint8_t data[] = {0x05, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}; // button 1 and 3 pressed
-	GTEST_ASSERT_EQ(mouse.parseData(data, sizeof(data), &mouse_data), true);
+	GTEST_ASSERT_EQ(mouse.parse_data(data, sizeof(data), &mouse_data), true);
 	GTEST_ASSERT_EQ(mouse_data.buttons[1], 1); // Button 1
 	GTEST_ASSERT_EQ(mouse_data.buttons[2], 0); // Button 2
 	GTEST_ASSERT_EQ(mouse_data.buttons[3], 1); // Button 3
@@ -104,13 +104,13 @@ TEST(MOUSE, test_mouse_parse_data_movement)
 	HIDMouse mouse(desc);
 	HIDMouseData mouse_data;
 
-	// X = 100 (0x0064), Y = -50 (0xFFCE), Wheel = 1
+	// x = 100 (0x0064), y = -50 (0xFFCE), wheel = 1
 	uint8_t data[] = {0x00, 0x00, 0x00, 0x01, 0x64, 0x00, 0xCE, 0xFF};
-	GTEST_ASSERT_EQ(mouse.parseData(data, sizeof(data), &mouse_data), true);
-	GTEST_ASSERT_EQ(mouse_data.X, 100);
-	GTEST_ASSERT_EQ(mouse_data.Y, -50);
-	GTEST_ASSERT_EQ(mouse_data.Wheel, 1);
+	GTEST_ASSERT_EQ(mouse.parse_data(data, sizeof(data), &mouse_data), true);
+	GTEST_ASSERT_EQ(mouse_data.x, 100);
+	GTEST_ASSERT_EQ(mouse_data.y, -50);
+	GTEST_ASSERT_EQ(mouse_data.wheel, 1);
 	GTEST_ASSERT_EQ(mouse_data.support & MOUSE_SUPPORT_X, MOUSE_SUPPORT_X);
 	GTEST_ASSERT_EQ(mouse_data.support & MOUSE_SUPPORT_Y, MOUSE_SUPPORT_Y);
-	GTEST_ASSERT_EQ(mouse_data.support & MOUSE_SUPPORT_Wheel, MOUSE_SUPPORT_Wheel);
+	GTEST_ASSERT_EQ(mouse_data.support & MOUSE_SUPPORT_WHEEL, MOUSE_SUPPORT_WHEEL);
 }

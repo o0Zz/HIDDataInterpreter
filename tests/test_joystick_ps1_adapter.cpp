@@ -91,7 +91,7 @@ TEST(PS1, test_input_parsing_incorrect_report_id)
 	HIDJoystickData joystick_data;
 	
 		//We should not be able to parse the data because reportID 1 is not present in report_data
-	GTEST_ASSERT_EQ(joystick.parseData(data, sizeof(data), &joystick_data), false);
+	GTEST_ASSERT_EQ(joystick.parse_data(data, sizeof(data), &joystick_data), false);
 }
 
 TEST(PS1, test_input_parsing_neutral)
@@ -104,8 +104,8 @@ TEST(PS1, test_input_parsing_neutral)
 	HIDJoystickData joystick_data;
 	
 		//We should not be able to parse the data because reportID 1 is not present in report_data
-	GTEST_ASSERT_EQ(joystick.parseData(data, sizeof(data), &joystick_data), true);
-	GTEST_ASSERT_EQ(joystick_data.X, -129);
+	GTEST_ASSERT_EQ(joystick.parse_data(data, sizeof(data), &joystick_data), true);
+	GTEST_ASSERT_EQ(joystick_data.x, -129);
 }
 
 TEST(PS1, test_input_index)
@@ -118,7 +118,7 @@ TEST(PS1, test_input_index)
 	HIDJoystickData joystick_data;
 	
 		//We should not be able to parse the data because reportID 1 is not present in report_data
-	GTEST_ASSERT_EQ(joystick.parseData(data, sizeof(data), &joystick_data), true);
+	GTEST_ASSERT_EQ(joystick.parse_data(data, sizeof(data), &joystick_data), true);
 	GTEST_ASSERT_EQ(joystick_data.index, 0);
 }
 

@@ -5,9 +5,9 @@
 /* ----------------------------------------------- */
 
 HIDMouseData::HIDMouseData() : support(0),
-                               X(0),
-                               Y(0),
-                               Wheel(0),
+                               x(0),
+                               y(0),
+                               wheel(0),
                                button_count(0)
 {
     memset(buttons, 0, sizeof(buttons));
@@ -34,14 +34,14 @@ HIDMouse::~HIDMouse()
 
 /* ----------------------------------------------- */
 
-bool HIDMouse::isValid()
+bool HIDMouse::is_valid()
 {
-    return getCount() > 0;
+    return get_count() > 0;
 }
 
 /* ----------------------------------------------- */
 
-uint8_t HIDMouse::getCount()
+uint8_t HIDMouse::get_count()
 {
     uint8_t count = 0;
 
@@ -56,7 +56,7 @@ uint8_t HIDMouse::getCount()
 
 /* ----------------------------------------------- */
 
-static int32_t signExtend(uint32_t value, uint32_t bits)
+static int32_t sign_extend(uint32_t value, uint32_t bits)
 {
     if (bits == 0 || bits >= 32)
         return (int32_t)value;
@@ -70,7 +70,7 @@ static int32_t signExtend(uint32_t value, uint32_t bits)
 
 /* ----------------------------------------------- */
 
-bool HIDMouse::parseData(uint8_t *data, uint16_t datalen, HIDMouseData *mouse_data)
+bool HIDMouse::parse_data(uint8_t *data, uint16_t datalen, HIDMouseData *mouse_data)
 {
     bool found = false;
 
@@ -83,14 +83,14 @@ bool HIDMouse::parseData(uint8_t *data, uint16_t datalen, HIDMouseData *mouse_da
 
         for (auto ioblock : report.inputs)
         {
-            uint32_t bitOffset = 0;
+            uint32_t bit_offset = 0;
 
             for (auto input : ioblock.data)
             {
-                uint32_t value = HIDUtils::readBitsLE(data, bitOffset, input.size);
-                bitOffset += input.size;
+                uint32_t value = HIDUtils::read_bits_le(data, bit_offset, input.size);
+                bit_offset += input.size;
 
-                if (bitOffset > (datalen * (uint32_t)8))
+                if (bit_offset > (datalen * (uint32_t)8))
                     return false; // Out of range
 
                 if (input.type == HIDIOType::ReportId)
@@ -113,17 +113,17 @@ bool HIDMouse::parseData(uint8_t *data, uint16_t datalen, HIDMouseData *mouse_da
                 else if (input.type == HIDIOType::X)
                 {
                     mouse_data->support |= MOUSE_SUPPORT_X;
-                    mouse_data->X = (int16_t)signExtend(value, input.size);
+                    mouse_data->x = (int16_t)sign_extend(value, input.size);
                 }
                 else if (input.type == HIDIOType::Y)
                 {
                     mouse_data->support |= MOUSE_SUPPORT_Y;
-                    mouse_data->Y = (int16_t)signExtend(value, input.size);
+                    mouse_data->y = (int16_t)sign_extend(value, input.size);
                 }
                 else if (input.type == HIDIOType::Wheel)
                 {
-                    mouse_data->support |= MOUSE_SUPPORT_Wheel;
-                    mouse_data->Wheel = (int16_t)signExtend(value, input.size);
+                    mouse_data->support |= MOUSE_SUPPORT_WHEEL;
+                    mouse_data->wheel = (int16_t)sign_extend(value, input.size);
                 }
             }
 

@@ -7,7 +7,7 @@
 
 #define MOUSE_SUPPORT_X      0x0001
 #define MOUSE_SUPPORT_Y      0x0002
-#define MOUSE_SUPPORT_Wheel  0x0004
+#define MOUSE_SUPPORT_WHEEL  0x0004
 
 class HIDMouseData
 {
@@ -17,9 +17,9 @@ public:
 
     uint16_t support;
 
-    int16_t X;  // relative delta
-    int16_t Y;  // relative delta
-    int16_t Wheel; // relative delta
+    int16_t x;  // relative delta
+    int16_t y;  // relative delta
+    int16_t wheel; // relative delta
 
     uint8_t button_count;
     uint8_t buttons[MAX_MOUSE_BUTTONS];
@@ -31,10 +31,10 @@ public:
     HIDMouse(const std::shared_ptr<HIDReportDescriptor> &descriptor);
     ~HIDMouse();
 
-    bool isValid();
-    uint8_t getCount();
+    bool is_valid();
+    uint8_t get_count();
 
-    bool parseData(uint8_t *data, uint16_t datalen, HIDMouseData *mouse_data);
+    bool parse_data(uint8_t *data, uint16_t datalen, HIDMouseData *mouse_data);
 
 private:
     std::vector<HIDIOReport> m_reports;
