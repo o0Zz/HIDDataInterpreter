@@ -76,26 +76,27 @@ bool HIDJoystick::parse_data(uint8_t *data, uint16_t datalen, HIDJoystickData *j
 {
     bool found = false;
     uint8_t joystick_count = 0;
+    const uint32_t total_bits = static_cast<uint32_t>(datalen) * 8;
 
     for (uint32_t i = 0; i < this->m_reports.size(); i++)
     {
-        auto report = this->m_reports[i];
+        const auto &report = this->m_reports[i];
 
         if (report.report_type != HIDIOReportType::Joystick && report.report_type != HIDIOReportType::GamePad)
             continue;
 
         joystick_count += 1;
 
-        for (auto ioblock : report.inputs)
+        for (const auto &ioblock : report.inputs)
         {
             uint32_t bit_offset = 0;
 
-            for (auto input : ioblock.data)
+            for (const auto &input : ioblock.data)
             {
                 uint32_t value = HIDUtils::read_bits_le(data, bit_offset, input.size);
                 bit_offset += input.size;
 
-                if (bit_offset > (datalen * (uint32_t)8))
+                if (bit_offset > total_bits)
                     return false; // Out of range
 
                 if (input.type == HIDIOType::ReportId)
@@ -107,73 +108,64 @@ bool HIDJoystick::parse_data(uint8_t *data, uint16_t datalen, HIDJoystickData *j
                 found = true;
                 joystick_data->index = joystick_count - 1;
 
-                if (input.type == HIDIOType::Button)
+                switch (input.type)
                 {
+                case HIDIOType::Button:
                     if (input.id >= MAX_BUTTONS)
                         return false;
-
                     joystick_data->buttons[input.id] = value;
                     if (joystick_data->button_count <= input.id)
                         joystick_data->button_count = input.id + 1;
-                }
-                if (input.type == HIDIOType::Consumer)
-                {
+                    break;
+                case HIDIOType::Consumer:
                     joystick_data->consumer_buttons[static_cast<HIDIOConsumerType>(input.id)] = value;
-                }
-                else if (input.type == HIDIOType::X)
-                {
+                    break;
+                case HIDIOType::X:
                     joystick_data->support |= JOYSTICK_SUPPORT_X;
                     joystick_data->x = map_value(value, input.logical_min, input.logical_max, -32768, 32767);
-                }
-                else if (input.type == HIDIOType::Y)
-                {
+                    break;
+                case HIDIOType::Y:
                     joystick_data->support |= JOYSTICK_SUPPORT_Y;
                     joystick_data->y = map_value(value, input.logical_min, input.logical_max, -32768, 32767);
-                }
-                else if (input.type == HIDIOType::Z)
-                {
+                    break;
+                case HIDIOType::Z:
                     joystick_data->support |= JOYSTICK_SUPPORT_Z;
                     joystick_data->z = map_value(value, input.logical_min, input.logical_max, -32768, 32767);
-                }
-                else if (input.type == HIDIOType::Rx)
-                {
+                    break;
+                case HIDIOType::Rx:
                     joystick_data->support |= JOYSTICK_SUPPORT_RX;
                     joystick_data->rx = map_value(value, input.logical_min, input.logical_max, -32768, 32767);
-                }
-                else if (input.type == HIDIOType::Ry)
-                {
+                    break;
+                case HIDIOType::Ry:
                     joystick_data->support |= JOYSTICK_SUPPORT_RY;
                     joystick_data->ry = map_value(value, input.logical_min, input.logical_max, -32768, 32767);
-                }
-                else if (input.type == HIDIOType::Rz)
-                {
+                    break;
+                case HIDIOType::Rz:
                     joystick_data->support |= JOYSTICK_SUPPORT_RZ;
                     joystick_data->rz = map_value(value, input.logical_min, input.logical_max, -32768, 32767);
-                }
-                else if (input.type == HIDIOType::Slider)
-                {
+                    break;
+                case HIDIOType::Slider:
                     joystick_data->support |= JOYSTICK_SUPPORT_SLIDER;
                     joystick_data->slider = map_value(value, input.logical_min, input.logical_max, -32768, 32767);
-                }
-                else if (input.type == HIDIOType::Dial)
-                {
+                    break;
+                case HIDIOType::Dial:
                     joystick_data->support |= JOYSTICK_SUPPORT_DIAL;
                     joystick_data->dial = map_value(value, input.logical_min, input.logical_max, -32768, 32767);
-                }
-                else if (input.type == HIDIOType::HatSwitch)
-                {
+                    break;
+                case HIDIOType::HatSwitch:
                     joystick_data->support |= JOYSTICK_SUPPORT_HAT_SWITCH;
                     joystick_data->hat_switch = (HIDJoystickHatSwitch)value;
-                }
-                else if (input.type == HIDIOType::Brake)
-                {
+                    break;
+                case HIDIOType::Brake:
                     joystick_data->support |= JOYSTICK_SUPPORT_BRAKE;
                     joystick_data->brake = map_value(value, input.logical_min, input.logical_max, -32768, 32767);
-                }
-                else if (input.type == HIDIOType::Accelerator)
-                {
+                    break;
+                case HIDIOType::Accelerator:
                     joystick_data->support |= JOYSTICK_SUPPORT_ACCELERATOR;
                     joystick_data->accelerator = map_value(value, input.logical_min, input.logical_max, -32768, 32767);
+                    break;
+                default:
+                    break;
                 }
             }
 
