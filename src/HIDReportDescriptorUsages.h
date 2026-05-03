@@ -18,7 +18,8 @@ enum class HIDUsageType
     GenericDesktop,
     Simulation,
     VendorDefined,
-    Consumer
+    Consumer,
+    Keyboard
 };
 
 //https://usb.org/sites/default/files/hut1_2.pdf p30

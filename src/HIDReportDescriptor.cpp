@@ -78,6 +78,8 @@ HIDInputOutput::HIDInputOutput(const HIDUsage &usage, uint32_t idx) : type(HIDIO
         this->type = HIDIOType::Padding;
     else if (usage.type == HIDUsageType::Consumer)
         this->type = HIDIOType::Consumer;
+    else if (usage.type == HIDUsageType::Keyboard)
+        this->type = HIDIOType::Key;
     else if (usage.type == HIDUsageType::VendorDefined)
     {
         this->type = HIDIOType::VendorDefined;

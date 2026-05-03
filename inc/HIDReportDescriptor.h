@@ -22,7 +22,8 @@ enum class HIDIOType
     Brake,
     Accelerator,
     HatSwitch,
-    Wheel
+    Wheel,
+    Key
 };
 class HIDUsage;
 

@@ -94,6 +94,8 @@ HIDUsageType convert_usage_page(uint32_t usage_page)
             return HIDUsageType::VendorDefined;
         case USAGE_PAGE_Consumer:
             return HIDUsageType::Consumer;
+        case USAGE_PAGE_Keyboard:
+            return HIDUsageType::Keyboard;
         default:
             return HIDUsageType::Unknown;
     }
