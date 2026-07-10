@@ -11,6 +11,24 @@ static int32_t mapValue(int32_t value, int32_t in_min, int32_t in_max, int32_t o
 
 /* ----------------------------------------------- */
 
+// Some devices (e.g. adapters exposing a real two's-complement stick, such as the
+// Adaptoid N64 adapter) declare a negative Logical Minimum for an axis. Per the HID
+// spec, a negative Logical Minimum means the raw field is two's-complement and must
+// be sign-extended from its declared bit length before being used as a signed value.
+static int32_t signExtend(uint32_t value, uint32_t bits)
+{
+    if (bits == 0 || bits >= 32)
+        return (int32_t)value;
+
+    uint32_t signBit = 1u << (bits - 1);
+    if (value & signBit)
+        return (int32_t)(value | (~0u << bits));
+
+    return (int32_t)value;
+}
+
+/* ----------------------------------------------- */
+
 HIDJoystickData::HIDJoystickData() : index(0xFF),
                                      support(0),
                                      X(0),
@@ -107,6 +125,11 @@ bool HIDJoystick::parseData(uint8_t *data, uint16_t datalen, HIDJoystickData *jo
                 found = true;
                 joystick_data->index = joystick_count - 1;
 
+                // A negative Logical Minimum means this field is two's-complement; sign-extend it
+                // from its declared bit length before treating it as a signed quantity. Fields with
+                // a non-negative Logical Minimum (the common case) are left as a plain magnitude.
+                int32_t signedValue = (input.logical_min < 0) ? signExtend(value, input.size) : (int32_t)value;
+
                 if (input.type == HIDIOType::Button)
                 {
                     if (input.id >= MAX_BUTTONS)
@@ -123,42 +146,42 @@ bool HIDJoystick::parseData(uint8_t *data, uint16_t datalen, HIDJoystickData *jo
                 else if (input.type == HIDIOType::X)
                 {
                     joystick_data->support |= JOYSTICK_SUPPORT_X;
-                    joystick_data->X = mapValue(value, input.logical_min, input.logical_max, -32768, 32767);
+                    joystick_data->X = mapValue(signedValue, input.logical_min, input.logical_max, -32768, 32767);
                 }
                 else if (input.type == HIDIOType::Y)
                 {
                     joystick_data->support |= JOYSTICK_SUPPORT_Y;
-                    joystick_data->Y = mapValue(value, input.logical_min, input.logical_max, -32768, 32767);
+                    joystick_data->Y = mapValue(signedValue, input.logical_min, input.logical_max, -32768, 32767);
                 }
                 else if (input.type == HIDIOType::Z)
                 {
                     joystick_data->support |= JOYSTICK_SUPPORT_Z;
-                    joystick_data->Z = mapValue(value, input.logical_min, input.logical_max, -32768, 32767);
+                    joystick_data->Z = mapValue(signedValue, input.logical_min, input.logical_max, -32768, 32767);
                 }
                 else if (input.type == HIDIOType::Rx)
                 {
                     joystick_data->support |= JOYSTICK_SUPPORT_Rx;
-                    joystick_data->Rx = mapValue(value, input.logical_min, input.logical_max, -32768, 32767);
+                    joystick_data->Rx = mapValue(signedValue, input.logical_min, input.logical_max, -32768, 32767);
                 }
                 else if (input.type == HIDIOType::Ry)
                 {
                     joystick_data->support |= JOYSTICK_SUPPORT_Ry;
-                    joystick_data->Ry = mapValue(value, input.logical_min, input.logical_max, -32768, 32767);
+                    joystick_data->Ry = mapValue(signedValue, input.logical_min, input.logical_max, -32768, 32767);
                 }
                 else if (input.type == HIDIOType::Rz)
                 {
                     joystick_data->support |= JOYSTICK_SUPPORT_Rz;
-                    joystick_data->Rz = mapValue(value, input.logical_min, input.logical_max, -32768, 32767);
+                    joystick_data->Rz = mapValue(signedValue, input.logical_min, input.logical_max, -32768, 32767);
                 }
                 else if (input.type == HIDIOType::Slider)
                 {
                     joystick_data->support |= JOYSTICK_SUPPORT_Slider;
-                    joystick_data->Slider = mapValue(value, input.logical_min, input.logical_max, -32768, 32767);
+                    joystick_data->Slider = mapValue(signedValue, input.logical_min, input.logical_max, -32768, 32767);
                 }
                 else if (input.type == HIDIOType::Dial)
                 {
                     joystick_data->support |= JOYSTICK_SUPPORT_Dial;
-                    joystick_data->Dial = mapValue(value, input.logical_min, input.logical_max, -32768, 32767);
+                    joystick_data->Dial = mapValue(signedValue, input.logical_min, input.logical_max, -32768, 32767);
                 }
                 else if (input.type == HIDIOType::HatSwitch)
                 {
@@ -168,12 +191,12 @@ bool HIDJoystick::parseData(uint8_t *data, uint16_t datalen, HIDJoystickData *jo
                 else if (input.type == HIDIOType::Brake)
                 {
                     joystick_data->support |= JOYSTICK_SUPPORT_Brake;
-                    joystick_data->Brake = mapValue(value, input.logical_min, input.logical_max, -32768, 32767);
+                    joystick_data->Brake = mapValue(signedValue, input.logical_min, input.logical_max, -32768, 32767);
                 }
                 else if (input.type == HIDIOType::Accelerator)
                 {
                     joystick_data->support |= JOYSTICK_SUPPORT_Accelerator;
-                    joystick_data->Accelerator = mapValue(value, input.logical_min, input.logical_max, -32768, 32767);
+                    joystick_data->Accelerator = mapValue(signedValue, input.logical_min, input.logical_max, -32768, 32767);
                 }
             }
 
