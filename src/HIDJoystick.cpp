@@ -108,6 +108,8 @@ bool HIDJoystick::parse_data(uint8_t *data, uint16_t datalen, HIDJoystickData *j
                 found = true;
                 joystick_data->index = joystick_count - 1;
 
+                int32_t signedValue = (input.logical_min < 0) ? HIDUtils::sign_extend(value, input.size) : (int32_t)value;
+
                 switch (input.type)
                 {
                 case HIDIOType::Button:
@@ -122,35 +124,35 @@ bool HIDJoystick::parse_data(uint8_t *data, uint16_t datalen, HIDJoystickData *j
                     break;
                 case HIDIOType::X:
                     joystick_data->support |= JOYSTICK_SUPPORT_X;
-                    joystick_data->x = map_value(value, input.logical_min, input.logical_max, -32768, 32767);
+                    joystick_data->x = map_value(signedValue, input.logical_min, input.logical_max, -32768, 32767);
                     break;
                 case HIDIOType::Y:
                     joystick_data->support |= JOYSTICK_SUPPORT_Y;
-                    joystick_data->y = map_value(value, input.logical_min, input.logical_max, -32768, 32767);
+                    joystick_data->y = map_value(signedValue, input.logical_min, input.logical_max, -32768, 32767);
                     break;
                 case HIDIOType::Z:
                     joystick_data->support |= JOYSTICK_SUPPORT_Z;
-                    joystick_data->z = map_value(value, input.logical_min, input.logical_max, -32768, 32767);
+                    joystick_data->z = map_value(signedValue, input.logical_min, input.logical_max, -32768, 32767);
                     break;
                 case HIDIOType::Rx:
                     joystick_data->support |= JOYSTICK_SUPPORT_RX;
-                    joystick_data->rx = map_value(value, input.logical_min, input.logical_max, -32768, 32767);
+                    joystick_data->rx = map_value(signedValue, input.logical_min, input.logical_max, -32768, 32767);
                     break;
                 case HIDIOType::Ry:
                     joystick_data->support |= JOYSTICK_SUPPORT_RY;
-                    joystick_data->ry = map_value(value, input.logical_min, input.logical_max, -32768, 32767);
+                    joystick_data->ry = map_value(signedValue, input.logical_min, input.logical_max, -32768, 32767);
                     break;
                 case HIDIOType::Rz:
                     joystick_data->support |= JOYSTICK_SUPPORT_RZ;
-                    joystick_data->rz = map_value(value, input.logical_min, input.logical_max, -32768, 32767);
+                    joystick_data->rz = map_value(signedValue, input.logical_min, input.logical_max, -32768, 32767);
                     break;
                 case HIDIOType::Slider:
                     joystick_data->support |= JOYSTICK_SUPPORT_SLIDER;
-                    joystick_data->slider = map_value(value, input.logical_min, input.logical_max, -32768, 32767);
+                    joystick_data->slider = map_value(signedValue, input.logical_min, input.logical_max, -32768, 32767);
                     break;
                 case HIDIOType::Dial:
                     joystick_data->support |= JOYSTICK_SUPPORT_DIAL;
-                    joystick_data->dial = map_value(value, input.logical_min, input.logical_max, -32768, 32767);
+                    joystick_data->dial = map_value(signedValue, input.logical_min, input.logical_max, -32768, 32767);
                     break;
                 case HIDIOType::HatSwitch:
                     joystick_data->support |= JOYSTICK_SUPPORT_HAT_SWITCH;
@@ -158,11 +160,11 @@ bool HIDJoystick::parse_data(uint8_t *data, uint16_t datalen, HIDJoystickData *j
                     break;
                 case HIDIOType::Brake:
                     joystick_data->support |= JOYSTICK_SUPPORT_BRAKE;
-                    joystick_data->brake = map_value(value, input.logical_min, input.logical_max, -32768, 32767);
+                    joystick_data->brake = map_value(signedValue, input.logical_min, input.logical_max, -32768, 32767);
                     break;
                 case HIDIOType::Accelerator:
                     joystick_data->support |= JOYSTICK_SUPPORT_ACCELERATOR;
-                    joystick_data->accelerator = map_value(value, input.logical_min, input.logical_max, -32768, 32767);
+                    joystick_data->accelerator = map_value(signedValue, input.logical_min, input.logical_max, -32768, 32767);
                     break;
                 default:
                     break;

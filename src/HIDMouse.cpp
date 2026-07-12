@@ -56,20 +56,6 @@ uint8_t HIDMouse::get_count()
 
 /* ----------------------------------------------- */
 
-static int32_t sign_extend(uint32_t value, uint32_t bits)
-{
-    if (bits == 0 || bits >= 32)
-        return (int32_t)value;
-
-    uint32_t sign_bit = 1u << (bits - 1);
-    if (value & sign_bit)
-        return (int32_t)(value | (~0u << bits));
-
-    return (int32_t)value;
-}
-
-/* ----------------------------------------------- */
-
 bool HIDMouse::parse_data(uint8_t *data, uint16_t datalen, HIDMouseData *mouse_data)
 {
     bool found = false;
@@ -113,15 +99,15 @@ bool HIDMouse::parse_data(uint8_t *data, uint16_t datalen, HIDMouseData *mouse_d
                     break;
                 case HIDIOType::X:
                     mouse_data->support |= MOUSE_SUPPORT_X;
-                    mouse_data->x = (int16_t)sign_extend(value, input.size);
+                    mouse_data->x = (int16_t)HIDUtils::sign_extend(value, input.size);
                     break;
                 case HIDIOType::Y:
                     mouse_data->support |= MOUSE_SUPPORT_Y;
-                    mouse_data->y = (int16_t)sign_extend(value, input.size);
+                    mouse_data->y = (int16_t)HIDUtils::sign_extend(value, input.size);
                     break;
                 case HIDIOType::Wheel:
                     mouse_data->support |= MOUSE_SUPPORT_WHEEL;
-                    mouse_data->wheel = (int16_t)sign_extend(value, input.size);
+                    mouse_data->wheel = (int16_t)HIDUtils::sign_extend(value, input.size);
                     break;
                 default:
                     break;
