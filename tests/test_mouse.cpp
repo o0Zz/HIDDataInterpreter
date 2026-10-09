@@ -114,3 +114,62 @@ TEST(MOUSE, test_mouse_parse_data_movement)
 	GTEST_ASSERT_EQ(mouse_data.support & MOUSE_SUPPORT_Y, MOUSE_SUPPORT_Y);
 	GTEST_ASSERT_EQ(mouse_data.support & MOUSE_SUPPORT_WHEEL, MOUSE_SUPPORT_WHEEL);
 }
+
+// Mouse on report id 2, media keys (Consumer Control, page 0x0C usage 0x01) on report id 3.
+const uint8_t mouse_with_consumer_report_data[] = {
+	0x05, 0x01,        // Usage Page (Generic Desktop Ctrls)
+	0x09, 0x02,        // Usage (Mouse)
+	0xA1, 0x01,        // Collection (Application)
+	0x85, 0x02,        //   Report ID (2)
+	0x09, 0x01,        //   Usage (Pointer)
+	0xA1, 0x00,        //   Collection (Physical)
+	0x05, 0x09,        //     Usage Page (Button)
+	0x19, 0x01,        //     Usage Minimum (0x01)
+	0x29, 0x08,        //     Usage Maximum (0x08)
+	0x15, 0x00,        //     Logical Minimum (0)
+	0x25, 0x01,        //     Logical Maximum (1)
+	0x95, 0x08,        //     Report Count (8)
+	0x75, 0x01,        //     Report Size (1)
+	0x81, 0x02,        //     Input (Data,Var,Abs)
+	0x05, 0x01,        //     Usage Page (Generic Desktop Ctrls)
+	0x09, 0x30,        //     Usage (X)
+	0x09, 0x31,        //     Usage (Y)
+	0x15, 0x81,        //     Logical Minimum (-127)
+	0x25, 0x7F,        //     Logical Maximum (127)
+	0x75, 0x08,        //     Report Size (8)
+	0x95, 0x02,        //     Report Count (2)
+	0x81, 0x06,        //     Input (Data,Var,Rel)
+	0xC0,              //   End Collection
+	0xC0,              // End Collection
+	0x05, 0x0C,        // Usage Page (Consumer)
+	0x09, 0x01,        // Usage (Consumer Control)
+	0xA1, 0x01,        // Collection (Application)
+	0x85, 0x03,        //   Report ID (3)
+	0x19, 0x00,        //   Usage Minimum (Unassigned)
+	0x2A, 0xFF, 0x03,  //   Usage Maximum (0x03FF)
+	0x15, 0x00,        //   Logical Minimum (0)
+	0x26, 0xFF, 0x03,  //   Logical Maximum (1023)
+	0x75, 0x10,        //   Report Size (16)
+	0x95, 0x01,        //   Report Count (1)
+	0x81, 0x00,        //   Input (Data,Array,Abs)
+	0xC0,              // End Collection
+};
+
+TEST(MOUSE, test_consumer_control_is_not_a_pointer)
+{
+	std::shared_ptr<HIDReportDescriptor> desc = std::make_shared<HIDReportDescriptor>(mouse_with_consumer_report_data, (uint16_t)sizeof(mouse_with_consumer_report_data));
+	GTEST_ASSERT_EQ(desc->get_device_types(), HID_DEVICE_MOUSE);
+
+	HIDMouse mouse(desc);
+	GTEST_ASSERT_EQ(mouse.get_count(), 1);
+
+	HIDMouseData mouse_data;
+	uint8_t volume_up[] = {0x03, 0xE9, 0x00};
+	GTEST_ASSERT_EQ(mouse.parse_data(volume_up, sizeof(volume_up), &mouse_data), false);
+
+	uint8_t move[] = {0x02, 0x01, 0x05, 0xFB};
+	GTEST_ASSERT_EQ(mouse.parse_data(move, sizeof(move), &mouse_data), true);
+	GTEST_ASSERT_EQ(mouse_data.buttons[1], 1);
+	GTEST_ASSERT_EQ(mouse_data.x, 5);
+	GTEST_ASSERT_EQ(mouse_data.y, -5);
+}

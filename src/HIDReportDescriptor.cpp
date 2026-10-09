@@ -120,7 +120,9 @@ void HIDReportDescriptor::parse(const uint8_t *hid_report_data, uint16_t hid_rep
     std::vector<HIDReport> hid_report_usage = HIDReportDescriptorUsages::parse(hid_report_elements);
     for (auto report : hid_report_usage)
     {
-        m_reports.push_back(HIDIOReport((HIDIOReportType)report.usages[0].sub_type));
+        // Report types are Generic Desktop usages; a Consumer Control collection (0x0C:0x01) is not a Pointer.
+        const HIDUsage &collection = report.usages[0];
+        m_reports.push_back(HIDIOReport(collection.type == HIDUsageType::GenericDesktop ? (HIDIOReportType)collection.sub_type : HIDIOReportType::Unknown));
 
         for (size_t k = 1; k < report.usages.size(); k++)
         {
